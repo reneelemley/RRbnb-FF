@@ -1,0 +1,12 @@
+{
+  "name": "Villa Saunter",
+  "short_name": "Villa Saunter",
+  "description": "A private villa in Sint Maarten.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F1E6",
+  "theme_color": "#12312F",
+  "icons": [
+    { "src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
