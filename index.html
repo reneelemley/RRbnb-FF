@@ -166,10 +166,13 @@
   .amen p{font-family:var(--ui);font-size:15px;color:var(--ink-2);margin:0;line-height:1.6;}
 
   /* ---- gallery ---- */
-  .gallery{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:200px;gap:14px;margin-top:52px;}
-  .gallery .ph{height:100%;}
-  .gallery .g-lg{grid-column:span 2;grid-row:span 2;}
-  @media(max-width:820px){.gallery{grid-template-columns:1fr 1fr;grid-auto-rows:150px;}.gallery .g-lg{grid-column:span 2;}}
+  .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:30px 14px;margin-top:52px;}
+  .gallery figure{margin:0;display:flex;flex-direction:column;}
+  .gallery .ph{aspect-ratio:4/3;}
+  .gallery .g-lg{grid-column:span 2;}
+  .gallery .g-lg .ph{aspect-ratio:16/9;}
+  .gallery figcaption{margin-top:11px;font-family:var(--ui);font-size:13px;letter-spacing:.03em;color:var(--ink-2);text-align:left;}
+  @media(max-width:820px){.gallery{grid-template-columns:1fr 1fr;}.gallery .g-lg{grid-column:span 2;}}
 
   /* ---- location split ---- */
   .split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:center;}
@@ -309,18 +312,18 @@
       <h2 class="h2">A look inside.</h2>
     </div>
     <div class="gallery rev d1">
-      <div class="ph g-lg"><img src="assets/photos/Living%20Dining%20Room.jpeg" alt="Living and dining room" loading="lazy" /></div>
-      <div class="ph"><img src="assets/photos/Kitchen.jpeg" alt="Kitchen" loading="lazy" /></div>
-      <div class="ph"><img src="assets/photos/Lower%20Balcony.jpeg" alt="Terrace and balcony" loading="lazy" /></div>
-      <div class="ph"><img src="assets/photos/Master%20Bedroom.jpeg" alt="Master bedroom" loading="lazy" /></div>
-      <div class="ph"><img src="assets/photos/Master%20Bath.jpeg" alt="Master bathroom" loading="lazy" /></div>
-      <div class="ph"><img src="assets/photos/Rooftop%20Day.jpeg" alt="Rooftop terrace" loading="lazy" /></div>
-      <div class="ph"><img src="assets/photos/Sitting%20Area.jpeg" alt="Sitting area" loading="lazy" /></div>
-      <div class="ph"><img src="assets/photos/Entry.jpeg" alt="Entry" loading="lazy" /></div>
-      <div class="ph"><img src="assets/photos/Upstairs.jpeg" alt="Upstairs hallway" loading="lazy" /></div>
-      <div class="ph"><img src="assets/photos/Living%20Dining%20Room%202.jpeg" alt="Living and dining room, second view" loading="lazy" /></div>
-      <div class="ph"><img src="assets/photos/Lower%20Balcony%202.jpeg" alt="Terrace and balcony, second view" loading="lazy" /></div>
-      <div class="ph"><img src="assets/photos/Kitchen%202.jpeg" alt="Kitchen, second view" loading="lazy" /></div>
+      <figure class="g-lg"><div class="ph"><img src="assets/photos/Living%20Dining%20Room.jpeg" alt="Living and dining room" loading="lazy" /></div><figcaption>Living &amp; Dining Room</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Kitchen.jpeg" alt="Kitchen" loading="lazy" /></div><figcaption>Kitchen</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Lower%20Balcony.jpeg" alt="Terrace and balcony" loading="lazy" /></div><figcaption>Lower Balcony</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Master%20Bath.jpeg" alt="Master bathroom" loading="lazy" /></div><figcaption>Master Bathroom</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Rooftop%20Day.jpeg" alt="Rooftop terrace" loading="lazy" /></div><figcaption>Rooftop Terrace</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Pool.jpeg" alt="Pool" loading="lazy" /></div><figcaption>Pool</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Sitting%20Area.jpeg" alt="Sitting area" loading="lazy" /></div><figcaption>Sitting Area</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Entry.jpeg" alt="Entry" loading="lazy" /></div><figcaption>Entry</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Upstairs.jpeg" alt="Upstairs hallway" loading="lazy" /></div><figcaption>Upstairs</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Living%20Dining%20Room%202.jpeg" alt="Living and dining room, second view" loading="lazy" /></div><figcaption>Living &amp; Dining Room</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Lower%20Balcony%202.jpeg" alt="Terrace and balcony, second view" loading="lazy" /></div><figcaption>Lower Balcony</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Kitchen%202.jpeg" alt="Kitchen, second view" loading="lazy" /></div><figcaption>Kitchen</figcaption></figure>
     </div>
   </div>
 </section>
