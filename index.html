@@ -368,6 +368,46 @@
     .stage img,.stage figure{transition:none!important;transform:none!important;}
     [data-par]{transform:none!important;}
   }
+
+  /* 9 · illustrated map */
+  .map{margin-top:clamp(48px,6vw,84px);background:linear-gradient(180deg,#EAF4F6,#DCEDF0);border-radius:6px;padding:clamp(18px,4vw,48px) clamp(14px,4vw,56px) 24px;position:relative;overflow:hidden;
+    box-shadow:inset 0 0 0 1px rgba(23,88,127,.08);}
+  .map::before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 70% 120%,rgba(23,88,127,.05) 0 1px,transparent 1px 22px);pointer-events:none;}
+  .map-art{position:relative;max-width:820px;margin:0 auto;aspect-ratio:888/540;}
+  .map-art img{width:100%;height:100%;display:block;filter:drop-shadow(0 18px 24px rgba(23,88,127,.18));}
+  .pin{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:8px;white-space:nowrap;font-family:var(--ui);}
+  .pin i{width:9px;height:9px;border-radius:50%;background:var(--stone);box-shadow:0 0 0 3px rgba(255,255,255,.9);flex:none;}
+  .pin b{text-shadow:0 0 3px #fff,0 0 6px #fff,0 0 10px rgba(255,255,255,.9);font-weight:500;font-size:clamp(10.5px,1.15vw,13px);color:var(--ink);letter-spacing:.02em;display:flex;flex-direction:column;line-height:1.25;}
+  .pin small{font-size:.86em;color:var(--sea);font-weight:600;letter-spacing:.06em;}
+  .pin.r{transform:translate(-4.5px,-50%);}
+  .pin.l{transform:translate(calc(-100% + 4.5px),-50%);flex-direction:row-reverse;text-align:right;}
+  .pin.home{transform:translate(-8px,-50%);}
+  .pin.home i{width:16px;height:16px;background:var(--gold);box-shadow:0 0 0 4px #fff,0 6px 14px rgba(169,130,60,.45);position:relative;}
+  .pin.home i::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--gold);animation:rr-ping 2.6s cubic-bezier(.2,.6,.3,1) infinite;}
+  .pin.home b{font-family:var(--disp);font-style:italic;font-size:clamp(14px,1.6vw,19px);}
+  .pin.home small{font-family:var(--ui);font-style:normal;color:var(--gold);}
+  @keyframes rr-ping{0%{transform:scale(1);opacity:.9;}100%{transform:scale(3.2);opacity:0;}}
+  .compass{position:absolute;right:2%;top:2%;font-family:var(--disp);font-style:italic;color:var(--stone);font-size:15px;width:30px;height:30px;border:1px solid rgba(23,88,127,.35);border-radius:50%;display:grid;place-items:center;}
+  .map-note{text-align:center;font-family:var(--ui);font-size:13px;color:var(--ink-3);margin:18px 0 0;}
+  @media(max-width:600px){.pin b{font-size:9.5px;}.pin small{font-size:9px;}.pin i{width:7px;height:7px;}.pin.home i{width:12px;height:12px;}.compass{display:none;}}
+  @media(prefers-reduced-motion:reduce){.pin.home i::after{animation:none;display:none;}}
+
+  /* 8 · live island bar */
+  .isle{background:var(--stone);color:#D6E6EF;font-family:var(--ui);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;}
+  .isle-in{max-width:var(--mx);margin:0 auto;padding:9px clamp(20px,5vw,48px);display:flex;justify-content:center;gap:clamp(14px,2.6vw,34px);align-items:center;white-space:nowrap;overflow:hidden;}
+  .isle span{display:inline-flex;align-items:center;gap:8px;}
+  .isle b{font-weight:500;color:#fff;letter-spacing:.12em;}
+  .isle .dot{width:6px;height:6px;border-radius:50%;background:#7FD3C8;box-shadow:0 0 0 0 rgba(127,211,200,.6);animation:rr-live 2.4s infinite;}
+  @keyframes rr-live{70%{box-shadow:0 0 0 7px rgba(127,211,200,0);}100%{box-shadow:0 0 0 0 rgba(127,211,200,0);}}
+  .isle svg{width:14px;height:14px;opacity:.85;}
+  @media(max-width:700px){.isle{font-size:10px;letter-spacing:.1em;}.isle .opt{display:none;}.isle-in{gap:14px;}}
+
+  /* 10 · next open dates */
+  .next-open{display:inline-flex;align-items:center;gap:10px;margin-top:22px;font-family:var(--ui);font-size:13.5px;color:var(--ink-2);text-decoration:none;padding:9px 16px 9px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.75);transition:border-color .3s,box-shadow .3s,transform .3s var(--ease);}
+  .next-open:hover{border-color:var(--sea);box-shadow:0 10px 24px -14px rgba(23,88,127,.4);transform:translateY(-1px);}
+  .next-open i{width:8px;height:8px;border-radius:50%;background:#2BB3A0;box-shadow:0 0 0 3px rgba(43,179,160,.18);}
+  .next-open b{color:var(--ink);font-weight:600;}
+  .next-open[hidden]{display:none;}
   /* Bodoni Moda: use its sturdier text cut at every size so thin strokes stay readable on screens */
   *{font-variation-settings:"opsz" 11;}
 </style>
@@ -378,6 +418,16 @@
   <small>Point Blanche &nbsp;·&nbsp; Sint Maarten</small>
 </div>
 <div class="cur" id="cur" aria-hidden="true"><span>View</span></div><div class="cur-dot" id="curDot" aria-hidden="true"></div>
+
+<!-- live island bar -->
+<div class="isle" aria-label="Right now in Point Blanche">
+  <div class="isle-in">
+    <span class="opt"><i class="dot"></i>Point Blanche · Sint Maarten</span>
+    <span><b id="isTime">—</b></span>
+    <span id="isWx" hidden><b id="isTemp"></b><em class="opt" id="isSky" style="font-style:normal"></em></span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 18h18M7 18a5 5 0 0110 0M12 7v3M5.2 10.6l1.6 1.2M18.8 10.6l-1.6 1.2"/></svg><span id="isSunLbl">Sunset</span> <b id="isSun">—</b></span>
+  </div>
+</div>
 
 <!-- ═══════════════ NAV (reused on every page) ═══════════════ -->
 <nav class="nav" id="nav">
@@ -422,6 +472,7 @@
       <a href="stay/" class="btn btn-solid">Family &amp; friends <span class="arw">→</span></a>
       <span class="btn btn-line is-soon" aria-disabled="true">Guest booking · coming soon</span>
     </div>
+    <a class="next-open rev d3" href="stay/" hidden data-next><i></i><span>Next open</span> <b data-next-dates></b> <span aria-hidden="true">→</span></a>
     <div class="hero-meta rev d3">
       <span>2-story villa</span>
       <span>One bedroom · sleeps four</span>
@@ -523,6 +574,21 @@
     </div>
     <div class="ph rev d1 wipe" style="aspect-ratio:4/3;" data-cur="view" data-open="Sea%20View%20Room.jpeg"><img src="assets/photos/Sea%20View%20Room.jpeg" alt="Sea view from the villa over Point Blanche" loading="lazy" data-par="0.08" /></div>
   </div>
+
+  <!-- illustrated map (island outline traced from the R&R mark) -->
+  <div class="map rev d1">
+    <div class="map-art" role="img" aria-label="Map of Sint Maarten showing the villa in Point Blanche and drive times">
+      <img src="assets/island-map.png" alt="" loading="lazy" />
+      <span class="pin home" style="left:67.57%;top:90.37%"><i></i><b>The villa<small>Point Blanche</small></b></span>
+      <span class="pin r" style="left:55.97%;top:77.78%"><i></i><b>Philipsburg<small>10 min</small></b></span>
+      <span class="pin r" style="left:21.62%;top:71.11%"><i></i><b>Princess Juliana Airport<small>30 min</small></b></span>
+      <span class="pin r" style="left:33.78%;top:46.30%"><i></i><b>Marigot<small>35 min</small></b></span>
+      <span class="pin r" style="left:49.55%;top:28.15%"><i></i><b>Grand Case<small>35 min</small></b></span>
+      <span class="pin l" style="left:88.06%;top:37.96%"><i></i><b>Orient Bay<small>25 min</small></b></span>
+      <span class="compass" aria-hidden="true">N</span>
+    </div>
+    <p class="map-note">Approximate drive times from the villa · allow extra at rush hour and on cruise-ship days.</p>
+  </div>
 </section>
 
 <!-- ═══════════════ TWO WAYS TO STAY ═══════════════ -->
@@ -541,6 +607,7 @@
         <p class="price">Complimentary <small>· by invitation</small></p>
         <p>Use the friends &amp; family code we gave you to see which dates are open and request your stay. Don't have it? Reach out to Ryan or Renée. No charge — this is your home too.</p>
         <a href="stay/" class="btn btn-solid">Enter your code <span class="arw">→</span></a>
+        <a class="next-open" href="stay/" hidden data-next style="margin-top:16px"><i></i><span>Next open</span> <b data-next-dates></b></a>
       </div>
       <div class="door door-soon" aria-disabled="true">
         <span class="dk">Friends of friends</span>
@@ -676,6 +743,51 @@
     document.addEventListener('mouseleave',function(){c.classList.add('hide');});
     (function loop(){ cx+=(mx-cx)*.2; cy+=(my-cy)*.2; c.style.transform='translate3d('+cx+'px,'+cy+'px,0)'; requestAnimationFrame(loop); })();
   }
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var TZ='America/Lower_Princes', LAT=18.013, LON=-63.035;
+  var $=function(id){return document.getElementById(id);};
+  /* 8 · island time, sunrise/sunset (computed locally), weather (Open-Meteo, no key) */
+  function tick(){ $('isTime').textContent=new Date().toLocaleTimeString('en-US',{timeZone:TZ,hour:'numeric',minute:'2-digit'}); }
+  function fmtT(d){ return d.toLocaleTimeString('en-US',{timeZone:TZ,hour:'numeric',minute:'2-digit'}); }
+  function sunTimes(date){ // NOAA approximation, good to ~1 minute
+    var rad=Math.PI/180, J=date/864e5+2440587.5, n=Math.round(J-2451545.0009+LON/360)-0;
+    var Js=2451545.0009-LON/360+n, M=(357.5291+0.98560028*(Js-2451545))%360, C=1.9148*Math.sin(M*rad)+0.02*Math.sin(2*M*rad)+0.0003*Math.sin(3*M*rad);
+    var L=(M+102.9372+C+180)%360, Jt=Js+0.0053*Math.sin(M*rad)-0.0069*Math.sin(2*L*rad), dec=Math.asin(Math.sin(L*rad)*Math.sin(23.44*rad));
+    var w=Math.acos((Math.sin(-0.833*rad)-Math.sin(LAT*rad)*Math.sin(dec))/(Math.cos(LAT*rad)*Math.cos(dec)))/rad;
+    var toD=function(j){return new Date((j-2440587.5)*864e5);}; return {rise:toD(Jt-w/360), set:toD(Jt+w/360)}; }
+  function sun(){ var now=new Date(), t=sunTimes(now);
+    if(now<t.set && now>t.rise){ $('isSunLbl').textContent='Sunset'; $('isSun').textContent=fmtT(t.set); }
+    else { var nx=now>t.set? sunTimes(new Date(+now+864e5)).rise : t.rise; $('isSunLbl').textContent='Sunrise'; $('isSun').textContent=fmtT(nx); } }
+  var SKY={0:'Clear',1:'Mostly clear',2:'Partly cloudy',3:'Cloudy',45:'Haze',48:'Haze',51:'Light drizzle',53:'Drizzle',55:'Drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',80:'Passing showers',81:'Showers',82:'Heavy showers',95:'Thunderstorms',96:'Thunderstorms',99:'Thunderstorms'};
+  function wx(){ fetch('https://api.open-meteo.com/v1/forecast?latitude='+LAT+'&longitude='+LON+'&current=temperature_2m,weather_code,wind_speed_10m&timezone='+encodeURIComponent(TZ))
+    .then(function(r){return r.ok?r.json():null;}).then(function(j){ if(!j||!j.current) return;
+      var c=Math.round(j.current.temperature_2m), f=Math.round(c*9/5+32), sky=SKY[j.current.weather_code]||'', w=j.current.wind_speed_10m;
+      $('isTemp').textContent=f+'°F · '+c+'°C'; $('isSky').textContent=(sky?' · '+sky:'')+(w>=20?', breezy':'');
+      $('isWx').hidden=false; }).catch(function(){}); }
+  tick(); sun(); wx(); setInterval(function(){tick();sun();},30000); setInterval(wx,15*60000);
+
+  /* 10 · next open dates (dates only, from the live calendar) */
+  var SB='https://afzgfurnffcnqxaaemxd.supabase.co', KEY='sb_publishable_50H5hXWrNc-zLhO-Gm41qw_vUWOAh3f';
+  fetch(SB+'/rest/v1/rpc/calendar',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:'{}'})
+    .then(function(r){return r.ok?r.json():null;}).then(function(rows){ if(!rows) return;
+      var pad=function(n){return String(n).padStart(2,'0');}, iso=function(d){return d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1)+'-'+pad(d.getUTCDate());};
+      var parts=new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).split('-');
+      var day=new Date(Date.UTC(+parts[0],+parts[1]-1,+parts[2]+1)); // from tomorrow
+      var taken={}; rows.forEach(function(b){ for(var d=new Date(b.check_in+'T00:00:00Z'); iso(d)<b.check_out; d.setUTCDate(d.getUTCDate()+1)) taken[iso(d)]=1; });
+      var MIN=3, start=null, len=0, limit=540;
+      for(var i=0;i<limit;i++){ var k=iso(day); if(!taken[k]){ if(!start) start=new Date(day); len++; if(len>=MIN){ break; } } else { start=null; len=0; } day.setUTCDate(day.getUTCDate()+1); }
+      if(!start||len<MIN) return;
+      var end=new Date(start); while(!taken[iso(end)] && (end-start)/864e5<120) end.setUTCDate(end.getUTCDate()+1);
+      var f=function(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});};
+      var txt=(end-start)/864e5>=120 ? 'from '+f(start) : f(start)+' – '+f(end);
+      document.querySelectorAll('[data-next-dates]').forEach(function(el){el.textContent=txt;});
+      document.querySelectorAll('[data-next]').forEach(function(el){el.hidden=false;});
+    }).catch(function(){});
 })();
 </script>
 </body>
