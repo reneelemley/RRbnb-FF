@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#FFFFFF" />
 <title>Family &amp; friends · The R&amp;R BnB</title>
-<meta name="description" content="Enter your personal code to see open dates and request your stay." />
+<meta name="description" content="Enter the family & friends code to see open dates and request your stay." />
 <meta name="robots" content="noindex" />
 <link rel="icon" href="../assets/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -176,15 +176,15 @@
   <div class="wrap head">
     <span class="eyebrow">Friends &amp; family</span>
     <h1 class="h1">Welcome. <span class="italic gold-text">Let's find your dates.</span></h1>
-    <p class="lead">Enter the personal code we gave you to see the calendar and request your stay. Each code belongs to one person, so please keep yours to yourself.</p>
+    <p class="lead">Enter the family &amp; friends code we shared with you to see the calendar and request your stay. Please keep it to yourself and don't pass it on.</p>
   </div>
   <div class="wrap">
     <div class="panel">
-      <label class="gate-label" for="code">Your personal code</label>
+      <label class="gate-label" for="code">Family &amp; friends code</label>
       <input id="code" class="code-in" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="• • • • • •" maxlength="40" />
       <button class="btn btn-gold unlock" id="go" type="button">See the calendar →</button>
       <p class="err" id="gateErr" role="alert"></p>
-      <p class="hint">Lost your code? Ask Ryan or Renée and we'll resend it.</p>
+      <p class="hint">Don't have the code? Ask Ryan or Renée.</p>
     </div>
   </div>
 </section>
@@ -310,13 +310,15 @@
    - SUPABASE_URL / SUPABASE_ANON_KEY: from Supabase -> Project Settings -> API.
      The anon key is designed to be public; the database's security rules
      (supabase/schema.sql) decide what it can do.
-   - NOTIFY_TO / NOTIFY_CC: who gets an email for each new request.
+   - NOTIFY_TO / NOTIFY_CC: who gets an email for each new request. NOTIFY_TO is the
+     FormSubmit alias for ryan@gusroberts.net (from FormSubmit's activation email), so
+     the address itself isn't visible in the page.
    Access codes are NOT in this file. Hosts add and remove them on this page
    after signing in, and the server checks every code.
    ════════════════════════════════════════════════════════════════════ */
 var SUPABASE_URL      = "https://afzgfurnffcnqxaaemxd.supabase.co";
 var SUPABASE_ANON_KEY = "sb_publishable_50H5hXWrNc-zLhO-Gm41qw_vUWOAh3f";
-var NOTIFY_TO = "ryan@gusroberts.net";
+var NOTIFY_TO = "5066de8e26914b58e2841c39c1383b89";
 var NOTIFY_CC = "renee.lemley@mac.com";
 
 (function(){
@@ -507,7 +509,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     if (r.error){
       var m = r.error.message || "";
       if (m.indexOf("dates_taken")>-1){ selIn=selOut=null; await refresh(); return formError("Someone just took some of those dates. Pick again."); }
-      if (m.indexOf("invalid_code")>-1) return formError("Your code isn't active any more. Ask Ryan or Renée for a new one.");
+      if (m.indexOf("invalid_code")>-1) return formError("That code isn't active any more. Ask Ryan or Renée for the current one.");
       if (m.indexOf("past_dates")>-1) return formError("Those dates are in the past. Pick again.");
       if (m.indexOf("too_far")>-1) return formError("Those dates are too far ahead to request yet.");
       renderRequest(); return formError("The request didn't go through. Check your connection and try again.");
