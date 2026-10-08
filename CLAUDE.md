@@ -29,9 +29,11 @@ Two audiences, one villa, one shared availability calendar:
 - Guests never read tables. They call `check_code`, `calendar` (dates + status only),
   `request_booking` (validates code, dates, overlaps) and `cancel_booking` (own request,
   same browser, via a cancel token).
-- **Hosts** (Ryan & Renée, listed in `public.hosts`) click "Hosts" in the footer of
-  `/stay/`, get an email sign-in link, and can confirm/release requests, block dates,
-  and add or turn off access codes — no code edits needed.
+- **Hosts** (Ryan & Renée, listed in `public.hosts`) go to `/admin/` (or "Host sign-in"
+  in the footer of `/stay/`), get an email sign-in link from Supabase, and can confirm,
+  release or **change the dates of** any stay, add a stay directly as Reserved, block and
+  move blocked dates, and add or turn off access codes — no code edits needed.
+- Access today: one shared friends & family code, `FRIENDSOFR&R` (case-insensitive).
 - New requests email `ryan@gusroberts.net` (cc `renee.lemley@mac.com`) through
   FormSubmit (formsubmit.co). The first ever submission sends a one-time activation
   email that must be clicked. Emails are sent from the browser after the request saves;

@@ -240,11 +240,21 @@
         </form>
 
         <div class="card" id="hostCard" hidden>
+          <div class="msg ok" id="moveBanner" hidden></div>
           <div><span class="eyebrow plain">Hosts only</span><h3>Block dates</h3></div>
           <p class="hint" id="blkSel">Select dates on the calendar, then block them here. Guests see them as Unavailable.</p>
           <div class="f"><label for="blkReason">Private note</label><input id="blkReason" type="text" maxlength="200" placeholder="e.g. We're away"></div>
           <button class="btn btn-solid sm" id="blkBtn" type="button" disabled>Block these dates</button>
           <p class="hint" id="blkMsg" hidden></p>
+          <div class="host-tools">
+            <div><span class="eyebrow plain">Add a stay</span></div>
+            <p class="hint">For someone who asked you directly. Select dates on the calendar first; it goes straight on as Reserved.</p>
+            <div class="row2"><div class="f"><label for="addName">Name</label><input id="addName" type="text" maxlength="120" placeholder="e.g. Mom &amp; Dad"></div>
+              <div class="f"><label for="addParty">Guests</label><input id="addParty" type="number" min="1" max="20" value="2"></div></div>
+            <div class="f"><label for="addEmail">Email <span style="text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></label><input id="addEmail" type="email" maxlength="160"></div>
+            <button class="btn btn-solid sm" id="addStay" type="button" disabled>Add stay on selected dates</button>
+            <p class="hint" id="addMsg" hidden></p>
+          </div>
           <div class="host-tools">
             <div><span class="eyebrow plain">Access codes</span></div>
             <div class="codes" id="codes"></div>
@@ -284,6 +294,7 @@
       <div class="f"><label for="hostEmail">Your email</label><input id="hostEmail" type="email" autocomplete="email"></div>
       <button class="btn btn-solid unlock" id="sendLink" type="button">Email me a sign-in link</button>
       <p class="err" id="hostErr" role="alert"></p>
+      <p class="hint">The link comes from Supabase. If it doesn't arrive in a minute, check Junk.</p>
       <p class="hint"><a href="#" id="backToGate" style="color:var(--gold);font-weight:600;text-decoration:none">← Back</a></p>
     </div>
   </div>
@@ -301,7 +312,7 @@
 <footer>
   <div class="foot-in">
     <span>© 2026 The R&amp;R BnB · Sint Maarten</span>
-    <button type="button" id="hostLink">Hosts</button>
+    <button type="button" id="hostLink">Host sign-in</button>
   </div>
 </footer>
 
@@ -406,9 +417,9 @@ var NOTIFY_CC = "renee.lemley@mac.com";
   }
   setInterval(function(){ if (!$("vault").hidden && !document.hidden) refresh(); }, 30000);
 
-  function nightMap(){
+  function nightMap(skipId){
     var m = new Map();
-    taken.forEach(function(b){ for (var d=b.check_in; d<b.check_out; d=addDays(d,1)) m.set(d,b); });
+    taken.forEach(function(b){ if (skipId && b.id===skipId) return; for (var d=b.check_in; d<b.check_out; d=addDays(d,1)) m.set(d,b); });
     return m;
   }
   function clash(a,b,map){ for (var d=a; d<b; d=addDays(d,1)) if (map.has(d)) return true; return false; }
@@ -448,7 +459,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
 
   $("months").addEventListener("click", function(e){
     var btn = e.target.closest(".d"); if (!btn || btn.disabled) return;
-    var ds = btn.dataset.d, map = nightMap();
+    var ds = btn.dataset.d, map = nightMap(moving && moving.id);
     show("formOk", false); show("formErr", false);
     if (!selIn || selOut || ds <= selIn){
       if (map.has(ds) || ds > LAST_NIGHT){ selIn = null; selOut = null; }
@@ -526,6 +537,29 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     await refresh();
   });
 
+  /* ---------- hosts: change dates ---------- */
+  var moving = null;   // {id, table, who}
+  function moveBtn(b, table){
+    var label = "Change dates";
+    if (moving && moving.id===b.id) label = (selIn && selOut) ? "Move to "+fmtShort(selIn)+" – "+fmtShort(selOut) : "Pick new dates above…";
+    return '<button class="btn btn-line sm" data-act="move" data-table="'+table+'" data-id="'+b.id+'">'+esc(label)+'</button>';
+  }
+  function renderMove(){
+    if (!isHost) return;
+    var bn = $("moveBanner");
+    if (!moving){ show("moveBanner", false); return; }
+    bn.innerHTML = "<b>Changing dates for "+esc(moving.who)+".</b> Pick the new arrival and departure on the calendar, then tap <b>Move to…</b> on that stay below. <a href=\"#\" id=\"moveCancel\" style=\"color:var(--sea);font-weight:600\">Cancel</a>";
+    show("moveBanner", true);
+    $("moveCancel").onclick = function(e){ e.preventDefault(); moving = null; selIn = selOut = null; render(); };
+  }
+  async function doMove(id, table){
+    if (!selIn || !selOut) return "Pick the new dates on the calendar first.";
+    if (clash(selIn, selOut, nightMap(id))) return "Those dates overlap another stay or block.";
+    var r = await sb.from(table).update({ check_in: selIn, check_out: selOut }).eq("id", id);
+    if (r.error) return r.error.message && r.error.message.indexOf("overlap")>-1 ? "Those dates overlap another stay." : "Didn't save. Try again.";
+    moving = null; selIn = selOut = null; await refresh(); return null;
+  }
+
   /* ---------- upcoming stays ---------- */
   function renderStays(){
     var el = $("stays"), mine = myStays();
@@ -538,7 +572,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
       var when = esc(fmtShort(b.check_in))+" to "+esc(fmt(b.check_out))+" · "+nightsLabel(n);
       if (b.status==="blocked"){
         return '<div class="stay"><div><div class="when">'+when+'<span class="pill blocked">Blocked</span></div><div class="who">'+(b.reason?esc(b.reason):"No note")+' · Guests see Unavailable</div></div>'
-             + '<div class="acts"><button class="btn danger sm" data-act="unblock" data-id="'+b.id+'">Unblock</button></div></div>';
+             + '<div class="acts">'+moveBtn(b,"blocks")+'<button class="btn danger sm" data-act="unblock" data-id="'+b.id+'">Unblock</button></div></div>';
       }
       var pill = b.status==="confirmed" ? '<span class="pill confirmed">Reserved</span>' : '<span class="pill requested">Requested</span>';
       var who = "", acts = "";
@@ -546,7 +580,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
         who = esc(b.name)+" · "+esc(b.party)+" guest"+(b.party>1?"s":"")+" · <a href=\"mailto:"+esc(b.email)+"\" style=\"color:var(--gold)\">"+esc(b.email)+"</a>"
             + (b.code_label ? " · code: "+esc(b.code_label) : "") + (b.notes ? "<br>“"+esc(b.notes)+"”" : "");
         if (b.status==="requested") acts += '<button class="btn btn-solid sm" data-act="confirm" data-id="'+b.id+'">Confirm</button>';
-        acts += '<button class="btn danger sm" data-act="release" data-id="'+b.id+'">Release dates</button>';
+        acts += moveBtn(b,"bookings") + '<button class="btn danger sm" data-act="release" data-id="'+b.id+'">Release dates</button>';
       } else {
         var m = mineIds[b.check_in+"|"+b.check_out];
         if (m){ pill += '<span class="pill mine">Yours</span>'; acts = '<button class="btn danger sm" data-act="cancel" data-id="'+esc(m.id)+'">Cancel my request</button>'; }
@@ -559,6 +593,19 @@ var NOTIFY_CC = "renee.lemley@mac.com";
   $("stays").addEventListener("click", async function(e){
     var btn = e.target.closest("button[data-act]"); if (!btn) return;
     var act = btn.dataset.act, id = btn.dataset.id;
+    if (act==="move"){
+      if (!moving || moving.id!==id){
+        var row = taken.filter(function(x){ return x.id===id; })[0] || {};
+        moving = { id: id, table: btn.dataset.table, who: row.name || (row.reason ? "the block “"+row.reason+"”" : "this block") };
+        selIn = selOut = null; render();
+        document.querySelector(".calhead").scrollIntoView({ behavior:"smooth", block:"start" });
+        return;
+      }
+      btn.disabled = true;
+      var err = await doMove(id, btn.dataset.table);
+      if (err){ btn.disabled = false; btn.textContent = err; setTimeout(renderStays, 3500); }
+      return;
+    }
     if (act!=="confirm" && !armed[id]){
       armed[id] = true;
       btn.textContent = act==="cancel" ? "Tap again to cancel" : act==="unblock" ? "Tap again to unblock" : "Tap again to release";
@@ -587,6 +634,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
       ? "Selected: "+fmtShort(selIn)+" to "+fmtShort(selOut)+", "+nightsLabel(diff(selIn,selOut))+". The departure day stays open."
       : "Select dates on the calendar, then block them here. Guests see them as Unavailable.";
     $("blkBtn").disabled = !ready;
+    $("addStay").disabled = !ready;
   }
   $("blkBtn").addEventListener("click", async function(){
     if (!selIn || !selOut) return;
@@ -597,6 +645,19 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     msg.textContent = r.error ? "Didn't save. Try again." : "Blocked "+fmtShort(selIn)+" to "+fmtShort(selOut)+".";
     show("blkMsg", true);
     if (!r.error){ $("blkReason").value = ""; selIn = selOut = null; refresh(); } else renderBlock();
+  });
+
+  /* ---------- hosts: add a stay directly ---------- */
+  $("addStay").addEventListener("click", async function(){
+    var msg = $("addMsg"), name = $("addName").value.trim(), em = $("addEmail").value.trim(), party = parseInt($("addParty").value,10)||1;
+    if (!selIn || !selOut){ msg.textContent = "Select the dates on the calendar first."; show("addMsg", true); return; }
+    if (!name){ msg.textContent = "Add who's staying."; show("addMsg", true); return; }
+    if (clash(selIn, selOut, nightMap())){ msg.textContent = "Those dates overlap another stay or block."; show("addMsg", true); return; }
+    $("addStay").disabled = true;
+    var r = await sb.from("bookings").insert({ check_in: selIn, check_out: selOut, name: name, email: em || "hosts@villa-rr.local", party: party, notes: "Added by host", code_label: "host", status: "confirmed" });
+    msg.textContent = r.error ? "Didn't save. Try again." : "Added "+name+", "+fmtShort(selIn)+" to "+fmtShort(selOut)+".";
+    show("addMsg", true);
+    if (!r.error){ $("addName").value = ""; $("addEmail").value = ""; selIn = selOut = null; refresh(); } else renderBlock();
   });
 
   /* ---------- hosts: access codes ---------- */
@@ -622,7 +683,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     if (!r.error){ $("newLabel").value = ""; $("newCode").value = ""; refresh(); }
   });
 
-  function render(){ renderCalendar(); renderRequest(); renderBlock(); renderStays(); renderCodes(); }
+  function render(){ renderCalendar(); renderRequest(); renderBlock(); renderStays(); renderCodes(); renderMove(); }
 
   /* ---------- host sign-in ---------- */
   $("hostLink").addEventListener("click", function(){
@@ -658,6 +719,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     var s = await sb.auth.getSession();
     if (await applySession(s.data.session)) return;
     sb.auth.onAuthStateChange(function(ev, session){ if (ev==="SIGNED_IN" && !isHost) applySession(session); });
+    if (location.hash === "#host"){ show("gate", false); show("hostLogin", true); render(); return; }
     var saved = store.get("rr_code", true);
     if (saved){
       var r = await sb.rpc("check_code", { p_code: saved });
