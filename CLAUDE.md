@@ -45,10 +45,11 @@ Two audiences, one villa, one shared availability calendar:
   its CSS and JS inlined. This mirrors how the owners' other site is built.
 - Pages: `/` (home), `/stay/` (coded family page), `/book/` (public guest page).
 - **Design system** lives in the `:root` CSS variables at the top of each page —
-  change those tokens to recolour the whole site. Current look: *quiet-luxury boutique*
-  — warm white / linen / sand, generous whitespace, hairline **gold** accents used
-  sparingly, and a single soft espresso (`--stone`) anchor at the footer. Keep it airy
-  and restrained; the gold should feel like jewelry, not paint.
+  change those tokens to recolour the whole site. Current look: white backgrounds with
+  pale sea-mist bands, **midnight navy** (`--stone`) for the footer, text and dark buttons,
+  **Caribbean sea teal** (`--sea`) for primary actions, and brass **gold** only for the
+  logo and small accents. No tan/linen/sand backgrounds: the owners asked for whites
+  plus Caribbean colors. Keep it airy and restrained.
   Fonts: **Fraunces** (display serif, often italic) + **Inter** (UI).
 - Shared building blocks reused across pages: sticky `.nav`, `.btn` variants
   (`.btn-solid` stone, `.btn-gold`, `.btn-line`), `.eyebrow` small-caps with gold
