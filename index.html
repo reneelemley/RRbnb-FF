@@ -194,9 +194,11 @@
   .lb .lb-x{top:14px;right:16px;} .lb .lb-p{left:8px;top:50%;transform:translateY(-50%);} .lb .lb-n{right:8px;top:50%;transform:translateY(-50%);}
   .gallery .g-full{grid-column:1 / -1;}
   .gallery .g-full .ph{aspect-ratio:21/9;}
-  .wip{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;pointer-events:none;
-    font-family:var(--ui);font-weight:600;font-size:clamp(18px,3.4vw,40px);letter-spacing:.42em;text-indent:.42em;text-transform:uppercase;
-    color:rgba(255,255,255,.88);background:rgba(40,32,24,.28);text-shadow:0 2px 18px rgba(0,0,0,.35);}
+  .wip{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;pointer-events:none;overflow:hidden;}
+  .wip::before{content:"In Progress";transform:rotate(-20deg);white-space:nowrap;
+    font-family:var(--ui);font-weight:700;font-size:clamp(11px,1.15vw,16px);letter-spacing:.26em;text-indent:.26em;text-transform:uppercase;
+    color:rgba(255,255,255,.62);border:1.5px solid rgba(255,255,255,.6);padding:.5em .9em;border-radius:2px;
+    text-shadow:0 1px 6px rgba(0,0,0,.25);box-shadow:0 0 0 1px rgba(0,0,0,.04);mix-blend-mode:normal;}
   .gallery .ph > img{position:absolute;inset:0;}
   .gallery figcaption{margin-top:11px;font-family:var(--ui);font-size:13px;letter-spacing:.03em;color:var(--ink-2);text-align:left;}
   @media(max-width:820px){.gallery{grid-template-columns:1fr 1fr;}.gallery .g-lg{grid-column:span 2;}}
@@ -351,8 +353,7 @@
       <figure><div class="ph"><img src="assets/photos/Master%20Bath.jpeg" alt="Master bathroom" loading="lazy" /></div><figcaption>Master Bathroom</figcaption></figure>
       <figure><div class="ph"><img src="assets/photos/Lower%20Balcony.jpeg" alt="Lower balcony with sea view" loading="lazy" /></div><figcaption>Lower Balcony</figcaption></figure>
       <figure><div class="ph"><img src="assets/photos/Pool.jpeg" alt="Pool" loading="lazy" /></div><figcaption>Pool</figcaption></figure>
-      <figure><div class="ph"><img src="assets/photos/Sea%20View%20Room.jpeg" alt="Room opening onto a sea-view terrace" loading="lazy" /></div><figcaption>Sea View</figcaption></figure>
-      <figure class="g-full"><div class="ph"><img src="assets/photos/Rooftop%20Day.jpeg" alt="Rooftop terrace by day, still being finished" loading="lazy" /><span class="wip" aria-hidden="true">In Progress</span></div><figcaption>Rooftop Terrace</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Rooftop%20Day.jpeg" alt="Rooftop terrace by day, still being finished" loading="lazy" /><span class="wip" aria-hidden="true"></span></div><figcaption>Rooftop Terrace</figcaption></figure>
     </div>
   </div>
 </section>
