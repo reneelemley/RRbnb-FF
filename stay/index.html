@@ -517,7 +517,14 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     if (!$("cCommit").checked) return formError("Please confirm you're certain you're coming. If you're still deciding, hold off and message us instead.");
     if (clash(selIn, selOut, nightMap())){ selIn=selOut=null; render(); return formError("Someone just took some of those dates. Pick again."); }
     $("submitBtn").disabled = true; $("submitBtn").textContent = "Sending…";
-    var r = await sb.rpc("request_booking", { p_code: code || "", p_check_in: selIn, p_check_out: selOut, p_name: name, p_email: email, p_party: party, p_notes: notes });
+    var r;
+    if (isHost && !code){
+      // Hosts are signed in and skip the code step, so save the request directly.
+      var ins = await sb.from("bookings").insert({ check_in: selIn, check_out: selOut, name: name, email: email, party: party, notes: notes, code_label: "host", status: "requested" }).select("id, cancel_token").single();
+      r = ins.error ? { error: { message: (ins.error.code==="23P01" ? "dates_taken" : (ins.error.message||"")) } } : { data: { id: ins.data.id, cancel_token: ins.data.cancel_token, label: "host" } };
+    } else {
+      r = await sb.rpc("request_booking", { p_code: code || "", p_check_in: selIn, p_check_out: selOut, p_name: name, p_email: email, p_party: party, p_notes: notes });
+    }
     $("submitBtn").textContent = "Send request →";
     if (r.error){
       var m = r.error.message || "";
