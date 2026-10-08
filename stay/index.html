@@ -5,12 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#FFFFFF" />
 <title>Family &amp; friends · The R&amp;R BnB</title>
-<meta name="description" content="Enter the family & friends code to see open dates and request your stay." />
-<meta name="robots" content="noindex" />
-<link rel="icon" href="../assets/favicon.svg" />
+<meta name="description" content="See open dates and request your stay at the villa in Point Blanche, Sint Maarten." />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" type="image/png" href="../assets/favicon.png" />
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
+<link rel="manifest" href="../site.webmanifest" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="The R&amp;R BnB" />
+<meta property="og:title" content="The R&amp;R BnB · Friends &amp; family" />
+<meta property="og:description" content="See open dates and request your stay at the villa in Point Blanche, Sint Maarten." />
+<meta property="og:url" content="https://ryangusroberts.github.io/rrbnb-site/stay/" />
+<meta property="og:image" content="https://ryangusroberts.github.io/rrbnb-site/assets/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#FFFFFF;--linen:#F3F8F9;--linen-2:#E6F0F2;--sand:#D5E6EA;--sand-2:#BFD6DC;--card:#FFFFFF;
@@ -20,7 +31,7 @@
     --sea:#1B8494;--sea-2:#2A9DAB;--sea-soft:#DDF0F1;
     --grad-sea:linear-gradient(103deg,#2A9DAB 0%,#1B8494 60%,#14636F 120%);
     --grad-gold:linear-gradient(103deg,#C6A15A 0%,#A9823C 60%,#8A6B2E 120%);
-    --disp:'Fraunces',Georgia,serif;--ui:'Inter',-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;
+    --disp:'Bodoni Moda','Didot','Bodoni 72',Georgia,serif;--ui:'Jost','Futura',-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;
     --mx:1180px;--ease:cubic-bezier(.2,.8,.2,1);
     --shadow:0 2px 10px rgba(18,38,58,.04),0 22px 50px rgba(18,38,58,.08);
   }
@@ -31,7 +42,7 @@
   [hidden]{display:none !important;}
   .wrap{max-width:var(--mx);margin:0 auto;padding:0 clamp(20px,5vw,48px);position:relative;}
   h1,h2,h3,h4{margin:0;font-family:var(--disp);font-weight:400;letter-spacing:-.01em;line-height:1.08;color:var(--ink);}
-  .h1{font-size:clamp(40px,5.6vw,70px);}
+  .h1{font-size:clamp(36px,4.8vw,60px);font-weight:400;line-height:1.06;}
   .lead{font-size:clamp(18px,1.5vw,21px);color:var(--ink-2);line-height:1.6;}
   .italic{font-style:italic;}.gold-text{color:var(--gold);}
   .eyebrow{font-family:var(--ui);font-weight:600;font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:14px;}
@@ -494,6 +505,10 @@ var NOTIFY_CC = "renee.lemley@mac.com";
         body: JSON.stringify({
           _subject: "Villa R&R: stay request from "+info.name+" ("+fmtShort(info.check_in)+" to "+fmtShort(info.check_out)+")",
           _cc: NOTIFY_CC, _template: "table", _captcha: "false",
+          // Copy to the guest: FormSubmit sends this to the "email" field below.
+          _autoresponse: "Thank you, "+info.name+". We've received your request to stay at the R&R BnB from "
+            + fmt(info.check_in)+" to "+fmt(info.check_out)+" ("+diff(info.check_in, info.check_out)+" nights, "+info.party+" guest"+(info.party>1?"s":"")+"). "
+            + "Ryan and Renée will confirm with you directly. Those dates are now held for you on the calendar. If your plans change, please let us know so we can open them up for others.",
           name: info.name, email: info.email,
           dates: fmt(info.check_in)+" to "+fmt(info.check_out),
           nights: String(diff(info.check_in, info.check_out)),
