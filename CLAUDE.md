@@ -58,7 +58,8 @@ Two audiences, one villa, one shared availability calendar:
   plus Caribbean colors. Keep it airy and restrained.
   Fonts: **Bodoni Moda** (Didone display serif, often italic gold) + **Jost** (Futura-like
   geometric sans for text, labels and spaced capitals). Chosen to match high-end resorts;
-  don't revert to Fraunces/Inter.
+  don't revert to Fraunces/Inter. Every page sets `font-variation-settings:"opsz" 11` so
+  Bodoni uses its sturdier text cut; without it the hairlines get too thin to read.
 - Shared building blocks reused across pages: sticky `.nav`, `.btn` variants
   (`.btn-solid` stone, `.btn-gold`, `.btn-line`), `.eyebrow` small-caps with gold
   hairlines, `.rev` reveal-on-scroll, `.ph` image placeholders, footer.
