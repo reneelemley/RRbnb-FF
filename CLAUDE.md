@@ -46,7 +46,7 @@ Two audiences, one villa, one shared availability calendar:
 - Pages: `/` (home), `/stay/` (coded family page), `/book/` (public guest page).
 - **Design system** lives in the `:root` CSS variables at the top of each page —
   change those tokens to recolour the whole site. Current look: white backgrounds with
-  pale sea-mist bands, **midnight navy** (`--stone`) for the footer, text and dark buttons,
+  pale sea-mist bands, **deep sea blue** (`--stone`, #17587F, taken from the water in the photos) for the footer and dark buttons, navy for text,
   **Caribbean sea teal** (`--sea`) for primary actions, and brass **gold** only for the
   logo and small accents. No tan/linen/sand backgrounds: the owners asked for whites
   plus Caribbean colors. Keep it airy and restrained.
