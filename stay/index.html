@@ -176,6 +176,17 @@
   .brand-rr{height:48px;width:auto;margin:-10px 0;display:inline-block;}
   /* Bodoni Moda: use its sturdier text cut at every size so thin strokes stay readable on screens */
   *{font-variation-settings:"opsz" 11;}
+
+  /* pool & hot tub (family & friends only) */
+  .amen{margin-top:clamp(48px,6vw,80px);}
+  .amen h2{font-size:clamp(28px,3.4vw,40px);margin-top:14px;}
+  .amen .sub{font-family:var(--ui);font-size:16px;line-height:1.65;color:var(--ink-2);max-width:60ch;margin-top:12px;}
+  .amen-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:clamp(12px,1.6vw,20px);margin-top:26px;}
+  .amen-grid figure{margin:0;overflow:hidden;border-radius:4px;height:clamp(300px,38vw,500px);background:var(--sea-soft);box-shadow:0 1px 2px rgba(18,38,58,.06),0 18px 40px -16px rgba(18,38,58,.28);position:relative;}
+  .amen-grid img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s cubic-bezier(.2,.7,.2,1);}
+  .amen-grid figure:hover img{transform:scale(1.05);}
+  .amen-grid figcaption{position:absolute;left:16px;bottom:14px;font-family:var(--ui);font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.45);}
+  @media(max-width:760px){.amen-grid{grid-template-columns:1fr;}.amen-grid figure{height:auto;aspect-ratio:4/3;}.amen-grid figure.tall{aspect-ratio:4/5;}}
 </style>
 </head>
 <body>
@@ -288,6 +299,16 @@
       <span class="eyebrow plain">On the calendar</span>
       <h2 id="stTitle">Upcoming stays</h2>
       <div class="stays" id="stays"><div class="empty">Loading…</div></div>
+    </section>
+
+    <section class="amen" aria-labelledby="amTitle">
+      <span class="eyebrow plain">While you're here</span>
+      <h2 id="amTitle">The pool &amp; <span class="italic gold-text">hot tub.</span></h2>
+      <p class="sub">Both are yours to enjoy during your stay. The hot tub looks straight out over the pool to the sea.</p>
+      <div class="amen-grid">
+        <figure><img src="../assets/photos/Hot%20Tub%20and%20Pool.jpeg" alt="Hot tub looking out over the pool to the sea" loading="lazy" style="object-position:center 60%" /><figcaption>Hot tub</figcaption></figure>
+        <figure class="tall"><img src="../assets/photos/Pool%20Terrace.jpeg" alt="Covered terrace with a chair, looking out to the pool and sea" loading="lazy" style="object-position:center 55%" /><figcaption>Pool terrace</figcaption></figure>
+      </div>
     </section>
 
     <div class="hostbar" id="hostBar" hidden>
