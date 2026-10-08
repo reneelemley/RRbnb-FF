@@ -817,7 +817,7 @@
 addEventListener('load',function(){
   "use strict";
   var el=document.getElementById('mapLive'); if(!el||!window.maplibregl) return;
-  try{ if(!maplibregl.supported || (maplibregl.supported && !maplibregl.supported())) return; }catch(e){}
+  try{ var t=document.createElement('canvas'); if(!(t.getContext('webgl2')||t.getContext('webgl'))) return; }catch(e){ return; }
   var VILLA=[-63.0372,18.0136];  // Point Blanche (area, not the exact house)
   var PLACES=[
     {n:'Philipsburg',t:'10 min',c:[-63.0471,18.0296],s:'r'},
