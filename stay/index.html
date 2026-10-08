@@ -181,12 +181,13 @@
   .amen{margin-top:clamp(48px,6vw,80px);}
   .amen h2{font-size:clamp(28px,3.4vw,40px);margin-top:14px;}
   .amen .sub{font-family:var(--ui);font-size:16px;line-height:1.65;color:var(--ink-2);max-width:60ch;margin-top:12px;}
-  .amen-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:clamp(12px,1.6vw,20px);margin-top:26px;}
-  .amen-grid figure{margin:0;overflow:hidden;border-radius:4px;height:clamp(300px,38vw,500px);background:var(--sea-soft);box-shadow:0 1px 2px rgba(18,38,58,.06),0 18px 40px -16px rgba(18,38,58,.28);position:relative;}
+  .amen-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:clamp(220px,24vw,340px);gap:clamp(12px,1.6vw,20px);margin-top:26px;}
+  .amen-grid figure{margin:0;overflow:hidden;border-radius:4px;background:var(--sea-soft);box-shadow:0 1px 2px rgba(18,38,58,.06),0 18px 40px -16px rgba(18,38,58,.28);position:relative;}
+  .amen-grid figure.w2{grid-column:span 2;}
   .amen-grid img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s cubic-bezier(.2,.7,.2,1);}
   .amen-grid figure:hover img{transform:scale(1.05);}
   .amen-grid figcaption{position:absolute;left:16px;bottom:14px;font-family:var(--ui);font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.45);}
-  @media(max-width:760px){.amen-grid{grid-template-columns:1fr;}.amen-grid figure{height:auto;aspect-ratio:4/3;}.amen-grid figure.tall{aspect-ratio:4/5;}}
+  @media(max-width:760px){.amen-grid{grid-template-columns:1fr 1fr;grid-auto-rows:200px;}.amen-grid figure.w2,.amen-grid figure:last-child{grid-column:span 2;}}
 </style>
 </head>
 <body>
@@ -304,12 +305,15 @@
     <section class="amen" aria-labelledby="amTitle">
       <span class="eyebrow plain">While you're here</span>
       <h2 id="amTitle">The pool, hot tub <span class="italic gold-text">&amp; bar.</span></h2>
-      <p class="sub">All yours to enjoy during your stay. The hot tub looks straight out over the pool to the sea, the outdoor bar has a grill for evenings in, and after dark the garden wall lights up over the water.</p>
+      <p class="sub">All yours to enjoy during your stay. The pool and hot tub look straight out to the sea, the lounge opens right onto the water, the outdoor bar has a grill for evenings in, and after dark the garden wall lights up over the water.</p>
       <div class="amen-grid">
+        <figure class="w2"><img src="../assets/photos/Pool%20Columns.jpeg" alt="The pool framed by columns, looking out to the sea and St. Barths" loading="lazy" style="object-position:center 62%" /><figcaption>The pool</figcaption></figure>
         <figure><img src="../assets/photos/Hot%20Tub%20and%20Pool.jpeg" alt="Hot tub looking out over the pool to the sea" loading="lazy" style="object-position:center 60%" /><figcaption>Hot tub</figcaption></figure>
-        <figure class="tall"><img src="../assets/photos/Pool%20Terrace.jpeg" alt="Covered terrace with a chair, looking out to the pool and sea" loading="lazy" style="object-position:center 55%" /><figcaption>Pool terrace</figcaption></figure>
+        <figure><img src="../assets/photos/Pool%20Day.jpeg" alt="The pool on a sunny afternoon with clouds over the sea" loading="lazy" style="object-position:center 60%" /><figcaption>Afternoon swim</figcaption></figure>
+        <figure class="w2"><img src="../assets/photos/Pool%20Lounge%20Night.jpeg" alt="Lounge with open sliding doors onto the pool and the balcony at night" loading="lazy" style="object-position:center 55%" /><figcaption>The lounge, opened up</figcaption></figure>
         <figure><img src="../assets/photos/Outdoor%20Bar.jpeg" alt="Outdoor bar with two stools and a grill, sea view through the window" loading="lazy" style="object-position:center 50%" /><figcaption>Outdoor bar &amp; grill</figcaption></figure>
-        <figure class="tall"><img src="../assets/photos/Pool%20at%20Night.jpeg" alt="The pool at night, palms lit against the stone wall" loading="lazy" style="object-position:center 40%" /><figcaption>The pool at night</figcaption></figure>
+        <figure><img src="../assets/photos/Pool%20at%20Night.jpeg" alt="The pool at night, palms lit against the stone wall" loading="lazy" style="object-position:center 40%" /><figcaption>The pool at night</figcaption></figure>
+        <figure><img src="../assets/photos/Pool%20Terrace.jpeg" alt="Covered terrace with a chair, looking out to the pool and sea" loading="lazy" style="object-position:center 55%" /><figcaption>Pool terrace</figcaption></figure>
       </div>
     </section>
 
