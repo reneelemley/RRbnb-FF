@@ -38,6 +38,10 @@ Two audiences, one villa, one shared availability calendar:
   FormSubmit (formsubmit.co). The first ever submission sends a one-time activation
   email that must be clicked. Emails are sent from the browser after the request saves;
   a failed email never loses a booking.
+- New requests also send the guest an automatic confirmation (FormSubmit `_autoresponse`).
+- A GitHub Action (`.github/workflows/keep-supabase-awake.yml`) pings Supabase twice a week
+  so the free project never pauses. GitHub turns off scheduled workflows after 60 days
+  with no repo activity — if the calendar ever stops loading, re-enable it under Actions.
 - Auth "Site URL" in Supabase is `https://ryangusroberts.github.io/rrbnb-site/stay/`.
   If the site moves to a custom domain, update it there and add the new URL.
 
@@ -52,7 +56,9 @@ Two audiences, one villa, one shared availability calendar:
   **Caribbean sea teal** (`--sea`) for primary actions, and brass **gold** only for the
   logo and small accents. No tan/linen/sand backgrounds: the owners asked for whites
   plus Caribbean colors. Keep it airy and restrained.
-  Fonts: **Fraunces** (display serif, often italic) + **Inter** (UI).
+  Fonts: **Bodoni Moda** (Didone display serif, often italic gold) + **Jost** (Futura-like
+  geometric sans for text, labels and spaced capitals). Chosen to match high-end resorts;
+  don't revert to Fraunces/Inter.
 - Shared building blocks reused across pages: sticky `.nav`, `.btn` variants
   (`.btn-solid` stone, `.btn-gold`, `.btn-line`), `.eyebrow` small-caps with gold
   hairlines, `.rev` reveal-on-scroll, `.ph` image placeholders, footer.
@@ -71,6 +77,11 @@ Two audiences, one villa, one shared availability calendar:
   is `assets/favicon.svg` (the R&R mark on its own).
 
 ## Hosting & publishing
+
+- **Private by design:** every page is `noindex, nofollow` and `robots.txt` disallows all.
+  Link previews (Open Graph) use `assets/og-image.jpg` with absolute github.io URLs.
+- **Moving to rrbnb.com (Renée's domain):** update the `og:url`/`og:image` URLs on all three
+  pages, add `CNAME`, set the domain in Settings → Pages, and update the Supabase Auth Site URL.
 
 - Hosted on **GitHub Pages**. Pushing to `main` republishes in ~1–2 minutes.
 - Custom domain: rename `CNAME.example` → `CNAME`, put the real domain inside, and set
