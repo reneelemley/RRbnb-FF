@@ -132,13 +132,13 @@
 
   /* ---- masthead (video/photo banner) ---- */
   .masthead{position:relative;height:min(72vh,720px);min-height:380px;overflow:hidden;background:var(--stone);}
-  .masthead .mm{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:mm-fade 13s ease-in-out infinite;z-index:0;}
-  .masthead .mm:nth-child(2){animation-delay:6.5s;}
+  .masthead .mm{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;z-index:0;
+    animation:mm-show 35s linear infinite;animation-delay:calc(var(--i) * 7s - 1.8s);will-change:opacity,transform;}
   .masthead::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(50,45,37,.14) 0%,rgba(50,45,37,0) 30%,rgba(50,45,37,0) 55%,var(--paper) 100%);pointer-events:none;}
-  .masthead .mm-brand{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+  .masthead .mm-brand{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(ellipse 38% 46% at 50% 50%,rgba(30,24,18,.30),rgba(30,24,18,0) 100%);}
   .masthead .mm-brand img{height:clamp(260px,40vw,460px);width:auto;filter:drop-shadow(0 6px 30px rgba(0,0,0,.5)) drop-shadow(0 2px 10px rgba(0,0,0,.4));}
-  @keyframes mm-fade{0%{opacity:0;}6%{opacity:1;}46%{opacity:1;}54%{opacity:0;}100%{opacity:0;}}
-  @media(prefers-reduced-motion:reduce){.masthead .mm{animation:none;opacity:1;}.masthead .mm:nth-child(2){display:none;}}
+  @keyframes mm-show{0%{opacity:0;transform:scale(1.02);}5.14%{opacity:1;}20.0%{opacity:1;}25.14%{opacity:0;transform:scale(1.10);}100%{opacity:0;transform:scale(1.10);}}
+  @media(prefers-reduced-motion:reduce){.masthead .mm{animation:none;opacity:0;}.masthead .mm:first-of-type{opacity:1;}}
   @media(max-width:600px){.masthead{height:58vh;min-height:380px;}.masthead .mm-brand img{height:clamp(300px,84vw,460px);}}
 
   /* ---- image placeholder ---- */
@@ -192,6 +192,12 @@
   .lb button{position:absolute;background:none;border:0;color:#f3ece2;font-size:30px;line-height:1;cursor:pointer;padding:12px;opacity:.8;}
   .lb button:hover{opacity:1;}
   .lb .lb-x{top:14px;right:16px;} .lb .lb-p{left:8px;top:50%;transform:translateY(-50%);} .lb .lb-n{right:8px;top:50%;transform:translateY(-50%);}
+  .gallery .g-full{grid-column:1 / -1;}
+  .gallery .g-full .ph{aspect-ratio:21/9;}
+  .wip{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;pointer-events:none;
+    font-family:var(--ui);font-weight:600;font-size:clamp(18px,3.4vw,40px);letter-spacing:.42em;text-indent:.42em;text-transform:uppercase;
+    color:rgba(255,255,255,.88);background:rgba(40,32,24,.28);text-shadow:0 2px 18px rgba(0,0,0,.35);}
+  .gallery .ph > img{position:absolute;inset:0;}
   .gallery figcaption{margin-top:11px;font-family:var(--ui);font-size:13px;letter-spacing:.03em;color:var(--ink-2);text-align:left;}
   @media(max-width:820px){.gallery{grid-template-columns:1fr 1fr;}.gallery .g-lg{grid-column:span 2;}}
 
@@ -255,13 +261,16 @@
      A short video works best here — 10–20s of the rooftop, the view, golden hour.
      Showing two photos on a slow crossfade for now.
      TO SWAP IN THE REAL VIDEO: delete the two <img class="mm"> lines below and replace with:
-       <video class="mm" autoplay muted loop playsinline poster="assets/photos/Rooftop.jpeg">
+       <video class="mm" autoplay muted loop playsinline poster="assets/photos/Rooftop%20Day.jpeg">
          <source src="assets/photos/PASTE_HERO_VIDEO_HERE.mp4" type="video/mp4">
        </video>
 -->
 <section class="masthead">
-  <img class="mm" src="assets/photos/Rooftop.jpeg" alt="Sunset from the rooftop" />
-  <img class="mm" src="assets/photos/Rooftop%20Day.jpeg" alt="Daytime view from the rooftop" />
+  <img class="mm" src="assets/photos/Rooftop%20Day.jpeg" alt="Rooftop terrace by day with daybed and sea view" style="object-position:center 60%;--i:0" />
+  <img class="mm" src="assets/photos/Living%20Dining%20Room.jpeg" alt="Living and dining room opening to the sea" style="object-position:center 55%;--i:1" />
+  <img class="mm" src="assets/photos/Master%20Bedroom.jpeg" alt="Master bedroom with balcony and ocean view" style="object-position:center 50%;--i:2" />
+  <img class="mm" src="assets/photos/Sea%20View%20Room.jpeg" alt="Sliding doors onto a sea-view terrace" style="object-position:30% 45%;--i:3" />
+  <img class="mm" src="assets/photos/Lower%20Balcony.jpeg" alt="Lower balcony looking down the coast" style="object-position:center 55%;--i:4" />
   <div class="mm-brand"><img src="assets/logo-rr-sxm.png" alt="R&amp;R SXM" /></div>
 </section>
 
@@ -335,16 +344,15 @@
     <div class="gallery rev d1">
       <figure><div class="ph"><img src="assets/photos/Entry.jpeg" alt="Entry walkway under the pergola" loading="lazy" style="object-position:center 70%" /></div><figcaption>Entry</figcaption></figure>
       <figure class="g-lg"><div class="ph"><img src="assets/photos/Living%20Dining%20Room.jpeg" alt="Living and dining room with sea view" loading="lazy" /></div><figcaption>Living &amp; Dining Room</figcaption></figure>
-      <figure><div class="ph"><img src="assets/photos/Kitchen.jpeg" alt="Kitchen" loading="lazy" /></div><figcaption>Kitchen</figcaption></figure>
       <figure><div class="ph"><img src="assets/photos/Sitting%20Area.jpeg" alt="Sitting area beneath the staircase" loading="lazy" style="object-position:center 60%" /></div><figcaption>Sitting Area</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Kitchen.jpeg" alt="Kitchen" loading="lazy" /></div><figcaption>Kitchen</figcaption></figure>
       <figure class="g-lg"><div class="ph"><img src="assets/photos/Master%20Bedroom.jpeg" alt="Master bedroom opening onto the balcony" loading="lazy" /></div><figcaption>Master Bedroom</figcaption></figure>
-      <figure><div class="ph"><img src="assets/photos/Master%20Bath.jpeg" alt="Master bathroom" loading="lazy" /></div><figcaption>Master Bathroom</figcaption></figure>
       <figure><div class="ph"><img src="assets/photos/Master%20Bedroom%202.jpeg" alt="Master bedroom from the upstairs landing" loading="lazy" /></div><figcaption>Master Bedroom</figcaption></figure>
-      <figure><div class="ph"><img src="assets/photos/Lower%20Balcony.jpeg" alt="Lower balcony" loading="lazy" /></div><figcaption>Lower Balcony</figcaption></figure>
-      <figure><div class="ph"><img src="assets/photos/Lower%20Balcony%202.jpeg" alt="Lower balcony, garden side" loading="lazy" /></div><figcaption>Lower Balcony</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Master%20Bath.jpeg" alt="Master bathroom" loading="lazy" /></div><figcaption>Master Bathroom</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Lower%20Balcony.jpeg" alt="Lower balcony with sea view" loading="lazy" /></div><figcaption>Lower Balcony</figcaption></figure>
       <figure><div class="ph"><img src="assets/photos/Pool.jpeg" alt="Pool" loading="lazy" /></div><figcaption>Pool</figcaption></figure>
-      <figure class="g-lg"><div class="ph"><img src="assets/photos/Rooftop%20Day.jpeg" alt="Rooftop terrace by day" loading="lazy" /></div><figcaption>Rooftop Terrace</figcaption></figure>
-      <figure class="g-lg"><div class="ph"><img src="assets/photos/Rooftop.jpeg" alt="Rooftop terrace at sunset" loading="lazy" /></div><figcaption>Rooftop at Sunset</figcaption></figure>
+      <figure><div class="ph"><img src="assets/photos/Sea%20View%20Room.jpeg" alt="Room opening onto a sea-view terrace" loading="lazy" /></div><figcaption>Sea View</figcaption></figure>
+      <figure class="g-full"><div class="ph"><img src="assets/photos/Rooftop%20Day.jpeg" alt="Rooftop terrace by day, still being finished" loading="lazy" /><span class="wip" aria-hidden="true">In Progress</span></div><figcaption>Rooftop Terrace</figcaption></figure>
     </div>
   </div>
 </section>
