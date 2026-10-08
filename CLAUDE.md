@@ -14,40 +14,34 @@ and (deliberately) none of that complexity. Keep it simple.
 
 Two audiences, one villa, one shared availability calendar:
 
-1. **Friends & family** (`/stay/`) — free stays. Reach the page with a **personal
-   access code**. Enter code → see open weeks → email to request dates.
-2. **Friends of friends** (`/book/`) — a shareable public page. No code. Same open
-   weeks, plus a **small nightly rate** to cover cleaning/expenses. Email to request.
+1. **Friends & family** (`/stay/`) — free stays. Enter a **personal access code**
+   (checked on the server) → live calendar → pick dates → send a request with
+   name and email. Live now.
+2. **Friends of friends** (`/book/`) — **coming soon**. The page and the "Book as a
+   guest" card show a Coming Soon state; don't re-enable without the owners asking.
 
-The physical villa is one place, so **availability is the same for both** — if a week
-is booked, it's booked for everyone. Both pages should show the *same* calendar.
+## The booking system (Supabase)
 
-## The booking model (important — don't over-build it)
-
-- **No booking engine, no online payments, no Stripe, no accounts.** Every stay is
-  confirmed by a human (the owners) over email, then paid in cash on arrival.
-- "Booking" on the site = a **pre-filled `mailto:` link**. The visitor picks a week from
-  the calendar, clicks the button, and their email app opens with the details ready.
-- The **access codes are a soft gate, not security.** They live in plain JavaScript in
-  `/stay/index.html` (the `CODES` object) and anyone technical could read them. That's
-  fine: the real gatekeeper is the owner, because nothing is confirmed until they reply.
-  The code just makes the page feel private and personal, one code per person.
-- If asked to make codes "more secure," explain the honest tradeoff: truly private
-  availability needs a backend (a serverless function + a hidden calendar), which adds
-  real complexity. Only go there if she clearly wants it.
-
-## The availability calendar
-
-The simplest reliable approach is a **public Google Calendar** made just for the villa:
-mark booked weeks as all-day events, make the calendar public (read-only), and paste its
-**embed URL** into the `<iframe>` in both `/stay/index.html` and `/book/index.html`
-(look for `PASTE_GOOGLE_CALENDAR_EMBED_URL_HERE`). Until that's done, a friendly
-placeholder shows instead. The owner blocks/opens weeks by editing the calendar — no
-code changes needed after it's wired once.
+- Backend: Supabase project `villa-rr` (org "R&R"). Schema, security rules and
+  functions live in `supabase/schema.sql` — re-run it in the SQL Editor after edits.
+- `stay/index.html` holds the public project URL and **publishable** key. These are
+  meant to be public; row-level security keeps guest names/emails private.
+- Guests never read tables. They call `check_code`, `calendar` (dates + status only),
+  `request_booking` (validates code, dates, overlaps) and `cancel_booking` (own request,
+  same browser, via a cancel token).
+- **Hosts** (Ryan & Renée, listed in `public.hosts`) click "Hosts" in the footer of
+  `/stay/`, get an email sign-in link, and can confirm/release requests, block dates,
+  and add or turn off access codes — no code edits needed.
+- New requests email `ryan@gusroberts.net` (cc `renee.lemley@mac.com`) through
+  FormSubmit (formsubmit.co). The first ever submission sends a one-time activation
+  email that must be clicked. Emails are sent from the browser after the request saves;
+  a failed email never loses a booking.
+- Auth "Site URL" in Supabase is `https://ryangusroberts.github.io/rrbnb-site/stay/`.
+  If the site moves to a custom domain, update it there and add the new URL.
 
 ## Stack & structure
 
-- **Plain HTML/CSS/JS. No build step.** Each page is a self-contained `index.html` with
+- **Plain HTML/CSS/JS. No build step.** The only external script is supabase-js (CDN) on `/stay/`. Each page is a self-contained `index.html` with
   its CSS and JS inlined. This mirrors how the owners' other site is built.
 - Pages: `/` (home), `/stay/` (coded family page), `/book/` (public guest page).
 - **Design system** lives in the `:root` CSS variables at the top of each page —
@@ -95,6 +89,4 @@ code changes needed after it's wired once.
 - Swap the placeholder logo at `/assets/logo.svg` for the real Version 3 export.
 - Replace the location, bedroom counts, and copy with the real details.
 - Drop the real photos into `/assets/photos/` and swap the gallery placeholders.
-- Wire the Google Calendar into both pages.
-- Set the real contact email everywhere (`hello@example.com` → the owners' address).
-- Add each family member's personal code to the `CODES` list in `/stay/index.html`.
+- Add family members' access codes from the host view on `/stay/` (not in code).
