@@ -860,7 +860,7 @@ addEventListener('load',function(){
   "use strict";
   var el=document.getElementById('mapLive'); if(!el||!window.maplibregl) return;
   try{ var t=document.createElement('canvas'); if(!(t.getContext('webgl2')||t.getContext('webgl'))) return; }catch(e){ return; }
-  var VILLA=[-63.0337,18.0137];  // Point Blanche (area, not the exact house)
+  var VILLA=[-63.0337,18.0137];  // approx. villa location, east end of Goldfinch Road (set by Ryan)
   var PLACES=[
     {n:'Philipsburg',t:'10 min',c:[-63.0470,18.0250],s:'r'},
     {n:'Princess Juliana Airport',t:'30 min',c:[-63.1089,18.0408],s:'r'},
