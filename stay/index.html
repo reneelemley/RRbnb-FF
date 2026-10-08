@@ -87,6 +87,7 @@
   .calhead h2{font-size:30px;margin-top:6px;}
   .years{display:flex;gap:6px;flex-wrap:wrap;}
   .years button{font:600 14px var(--ui);padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-variant-numeric:tabular-nums;}
+  .years-bottom{justify-content:center;margin-top:22px;}
   .years button[aria-pressed="true"]{background:var(--stone);color:#F4F7F9;border-color:var(--stone);}
   .legend{display:flex;flex-wrap:wrap;gap:16px;font:500 13px var(--ui);color:var(--ink-2);margin-bottom:14px;}
   .legend span{display:inline-flex;align-items:center;gap:7px;}
@@ -229,6 +230,7 @@
         </div>
         <p class="tip" id="calStatus">Loading the calendar…</p>
         <div class="months" id="months"></div>
+        <div class="years years-bottom" id="yearsBottom" role="group" aria-label="Year"></div>
       </section>
 
       <aside class="side">
@@ -438,15 +440,21 @@ var NOTIFY_CC = "renee.lemley@mac.com";
   function clash(a,b,map){ for (var d=a; d<b; d=addDays(d,1)) if (map.has(d)) return true; return false; }
 
   /* ---------- calendar ---------- */
-  YEARS.forEach(function(y){
-    var b = document.createElement("button");
-    b.type = "button"; b.textContent = y;
-    b.addEventListener("click", function(){ year = y; render(); });
-    $("years").appendChild(b);
+  ["years","yearsBottom"].forEach(function(gid){
+    YEARS.forEach(function(y){
+      var b = document.createElement("button");
+      b.type = "button"; b.textContent = y;
+      b.addEventListener("click", function(){
+        year = y; render();
+        // from the bottom row, jump back to January of the chosen year
+        if (gid==="yearsBottom") document.querySelector(".calhead").scrollIntoView({ behavior:"smooth", block:"start" });
+      });
+      $(gid).appendChild(b);
+    });
   });
 
   function renderCalendar(){
-    [].forEach.call($("years").children, function(b){ b.setAttribute("aria-pressed", String(+b.textContent===year)); });
+    [].forEach.call(document.querySelectorAll("#years button, #yearsBottom button"), function(b){ b.setAttribute("aria-pressed", String(+b.textContent===year)); });
     var map = nightMap(), html = "";
     for (var m=0; m<12; m++){
       var first = new Date(Date.UTC(year,m,1));
