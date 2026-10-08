@@ -208,6 +208,13 @@
   @media(max-width:880px){.split{grid-template-columns:1fr;gap:32px;}}
 
   /* ---- two ways to stay (light sand band, white cards) ---- */
+  .door-soon{position:relative;overflow:hidden;}
+  .door-soon > *:not(.soon-mark){opacity:.38;filter:grayscale(.4);pointer-events:none;user-select:none;}
+  .soon-mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+  .soon-mark::before{content:"Coming Soon";transform:rotate(-22deg);white-space:nowrap;font-family:var(--ui);font-weight:700;
+    font-size:clamp(18px,2.4vw,28px);letter-spacing:.34em;text-indent:.34em;text-transform:uppercase;color:var(--gold);
+    border:2px solid var(--gold);padding:.5em 1.1em;border-radius:2px;background:rgba(255,255,255,.7);}
+  .btn.is-soon{opacity:.55;cursor:default;pointer-events:none;}
   .doors{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:52px;}
   @media(max-width:760px){.doors{grid-template-columns:1fr;}}
   .door{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:44px 40px;display:flex;flex-direction:column;text-align:center;align-items:center;transition:transform .28s var(--ease),box-shadow .28s var(--ease);}
@@ -254,7 +261,7 @@
       <a href="#gallery">Gallery</a>
       <a href="#location">Location</a>
       <a href="stay/">Family &amp; Friends</a>
-      <a href="https://todayinsxm.com/" target="_blank" rel="noopener">Island Guide</a><a href="book/" class="nav-cta">Book a stay</a>
+      <a href="https://todayinsxm.com/" target="_blank" rel="noopener">Island Guide</a><a href="stay/" class="nav-cta">Book a stay</a>
     </div>
   </div>
 </nav>
@@ -284,7 +291,7 @@
     <p class="lead rev d2">Perched at the top of the hill in Point Blanche, this 2-story villa is gated, secure, and completely private, with St. Barths sitting right on the horizon. One bedroom plus a queen pull-out for extra guests, and a rooftop built for sunrise coffee and sunset views.</p>
     <div class="hero-cta rev d3">
       <a href="stay/" class="btn btn-solid">Family &amp; friends <span class="arw">→</span></a>
-      <a href="book/" class="btn btn-line">Book as a guest</a>
+      <span class="btn btn-line is-soon" aria-disabled="true">Guest booking · coming soon</span>
     </div>
     <div class="hero-meta rev d3">
       <span>2-story villa</span>
@@ -378,7 +385,7 @@
       <svg class="star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z"/></svg>
       <span class="eyebrow" style="margin-top:16px;">Two ways to stay</span>
       <h2 class="h2">Come as family, <span class="italic gold-text">or come as a guest.</span></h2>
-      <p class="lead" style="margin-left:auto;margin-right:auto;">Both begin the same way — you tell us the week you'd like, and we hold it for you. Every stay is arranged and coordinated directly with us.</p>
+      <p class="lead" style="margin-left:auto;margin-right:auto;">Family and friends can request dates now with their personal code. Guest booking opens soon. Every stay is arranged and coordinated directly with us.</p>
     </div>
     <div class="doors rev d1">
       <div class="door">
@@ -388,12 +395,13 @@
         <p>You have a personal access code. Enter it to see which weeks are open, choose your dates, and send us a note. No charge — this is your home too.</p>
         <a href="stay/" class="btn btn-solid">Enter your code <span class="arw">→</span></a>
       </div>
-      <div class="door">
+      <div class="door door-soon" aria-disabled="true">
         <span class="dk">Friends of friends</span>
         <h3>Book as a guest</h3>
         <p class="price">A modest nightly rate <small>· to cover costs</small></p>
         <p>Someone we know sent you? Wonderful. See what's open and request your dates. The rate covers cleaning and expenses — well under comparable villas nearby.</p>
-        <a href="book/" class="btn btn-gold">See open weeks <span class="arw">→</span></a>
+        <span class="btn btn-gold" aria-hidden="true">See open weeks <span class="arw">→</span></span>
+        <span class="soon-mark" aria-label="Coming soon"></span>
       </div>
     </div>
   </div>
@@ -407,8 +415,6 @@
       <p>A private villa in Sint Maarten, kept for the people we love.</p>
       <div class="foot-grid">
         <a href="stay/">Family &amp; friends</a>
-        <a href="book/">Book as a guest</a>
-        <a href="mailto:hello@example.com">hello@example.com</a>
       </div>
     </div>
     <div class="foot-bot">© 2026 The R&amp;R BnB · Sint Maarten</div>
