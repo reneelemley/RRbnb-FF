@@ -116,6 +116,42 @@
   .d.selend{background:var(--sea);color:#fff;font-weight:700;}
   .d.today{box-shadow:inset 0 0 0 1.5px var(--ink);}
 
+
+  /* ---- island events ---- */
+  .d{position:relative;}
+  .d.ev::after{content:"";position:absolute;left:50%;bottom:3px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--gold);}
+  .d.ev.exp::after{background:transparent;box-shadow:inset 0 0 0 1.2px var(--gold);}
+  .d.conf.ev::after,.d.selend.ev::after{background:#F4D58D;}
+  .sw.evsw{border:0;background:radial-gradient(circle,var(--gold) 0 3px,transparent 3.5px);}
+  .evwrap{margin-top:34px;padding-top:26px;border-top:1px solid var(--line);}
+  .evhead{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:10px;}
+  .evhead h3{margin:10px 0 0;font-family:var(--disp);font-weight:400;font-size:clamp(24px,2.6vw,30px);color:var(--ink);}
+  .evhead h3 i{color:var(--gold);}
+  .evhead p{margin:0;font:500 13px var(--ui);color:var(--ink-3);}
+  .evstrip{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:16px 2px 18px;margin:0 -2px;}
+  .evstrip::-webkit-scrollbar{display:none;}
+  .evc{flex:0 0 190px;scroll-snap-align:start;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px 16px 14px;cursor:pointer;font:inherit;color:inherit;display:flex;flex-direction:column;gap:8px;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s,border-color .25s;}
+  .evc:hover,.evc:focus-visible{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 16px 34px -18px rgba(18,38,58,.35);outline:none;}
+  .evc.past{opacity:.5;}
+  .evtag{align-self:flex-start;font:600 10.5px var(--ui);letter-spacing:.16em;text-transform:uppercase;padding:4px 8px;border-radius:999px;background:var(--sea-soft);color:var(--sea);}
+  .evtag.sb{background:#F5EEDD;color:#8A6A2E;}
+  .evtag.ax{background:#E3EDF4;color:var(--stone);}
+  .evwhen{font:600 12.5px var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);}
+  .evname{font-family:var(--disp);font-style:italic;font-size:19px;line-height:1.2;color:var(--ink);}
+  .evstat{margin-top:auto;font:500 12px var(--ui);color:var(--ink-3);}
+  .evstat b{color:var(--sea);font-weight:600;}
+  dialog.evcard{border:0;padding:0;border-radius:8px;max-width:min(440px,calc(100vw - 32px));width:100%;box-shadow:0 30px 80px -20px rgba(10,24,37,.55);color:var(--ink);}
+  dialog.evcard::backdrop{background:rgba(10,24,37,.45);backdrop-filter:blur(3px);}
+  .evcard .in{padding:26px 26px 22px;position:relative;}
+  .evcard h3{font-family:var(--disp);font-weight:400;font-style:italic;font-size:30px;line-height:1.1;margin:12px 0 6px;}
+  .evcard .when{font:600 13px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
+  .evcard p{font:400 15.5px/1.6 var(--ui);color:var(--ink-2);margin:14px 0 0;}
+  .evcard .note{font-size:13px;color:var(--ink-3);}
+  .evcard .acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
+  .evcard .x{position:absolute;top:10px;right:12px;background:none;border:0;font-size:26px;line-height:1;color:var(--ink-3);cursor:pointer;padding:6px;}
+  .d.flash{animation:evflash 1.6s ease 2;}
+  @keyframes evflash{50%{box-shadow:inset 0 0 0 2px var(--gold);}}
+
   /* ---- side cards ---- */
   .side{display:grid;gap:18px;position:sticky;top:84px;}
   @media(max-width:980px){.side{position:static;}}
@@ -239,9 +275,17 @@
           <span><i class="sw conf"></i>Reserved</span>
           <span><i class="sw blk"></i>Unavailable</span>
           <span><i class="sw sel"></i>Your selection</span>
+          <span><i class="sw evsw"></i>Island event</span>
         </div>
         <p class="tip" id="calStatus">Loading the calendar…</p>
         <div class="months" id="months"></div>
+        <div class="evwrap" aria-labelledby="evTitle">
+          <div class="evhead">
+            <div><span class="eyebrow plain">On the islands</span><h3 id="evTitle">Worth planning around</h3></div>
+            <p>Sint Maarten · St. Barts · Anguilla. Tap for details.</p>
+          </div>
+          <div class="evstrip" id="evStrip"></div>
+        </div>
         <div class="years years-bottom" id="yearsBottom" role="group" aria-label="Year"></div>
       </section>
 
@@ -323,6 +367,18 @@
     </div>
   </div>
 </section>
+
+<dialog class="evcard" id="evCard" aria-labelledby="evcName">
+  <div class="in">
+    <button type="button" class="x" id="evcX" aria-label="Close">×</button>
+    <span class="evtag" id="evcTag"></span>
+    <h3 id="evcName"></h3>
+    <div class="when" id="evcWhen"></div>
+    <p id="evcBlurb"></p>
+    <p class="note" id="evcNote"></p>
+    <div class="acts"><button type="button" class="btn btn-solid sm" id="evcShow">Show On Calendar</button><a class="btn btn-line sm" id="evcLink" target="_blank" rel="noopener">Official Site ↗</a></div>
+  </div>
+</dialog>
 
 <!-- ═══════════ HOST SIGN-IN ═══════════ -->
 <section id="hostLogin" hidden>
@@ -466,6 +522,91 @@ var NOTIFY_CC = "renee.lemley@mac.com";
   }
   function clash(a,b,map){ for (var d=a; d<b; d=addDays(d,1)) if (map.has(d)) return true; return false; }
 
+  /* ---------- island events ----------
+     Edit here. d = [from, to] (to optional). exp:true = expected (usual pattern, not yet announced).
+     tba = no dates yet, shown as text only (no dot on the calendar). */
+  var EVDEF = {
+    heineken:{n:"St. Maarten Heineken Regatta", i:"SXM", u:"https://heinekenregatta.com", b:"The Caribbean's “Serious Fun” regatta: big-boat racing off the island by day, island-wide parties by night. Always the first weekend of March."},
+    sxmfest:{n:"SXM Festival", i:"SXM", b:"Five days of electronic music at beaches, villas and hilltops across both sides of the island."},
+    carnF:{n:"Carnival in Marigot", i:"SXM", b:"The French side's pre-Lent Carnival: street parades and deboulés through Marigot, ending with the burning of King Momo."},
+    carnD:{n:"Carnival Grand Parade", i:"SXM", b:"The high point of Sint Maarten Carnival in Philipsburg: costumed troupes on Carnival Day. Carnival Village runs for two weeks before, with food booths, calypso and J'ouvert."},
+    emanc:{n:"Emancipation Day", i:"SXM", b:"A public holiday marking the end of slavery, with cultural events on the Dutch side."},
+    stmday:{n:"St. Martin's Day", i:"SXM", b:"The island's shared holiday, celebrated on both the Dutch and French sides with parades and festivities."},
+    sbmusic:{n:"St Barth Music Festival", i:"St. Barts", b:"Two weeks of classical, opera and jazz in small venues around the island."},
+    sbcarn:{n:"Carnival & Mardi Gras, Gustavia", i:"St. Barts", b:"Costumed parades through Gustavia for Mardi Gras."},
+    bucket:{n:"St Barths Bucket", i:"St. Barts", u:"https://bucketregatta.com", b:"Invitation-only superyacht regatta. The yachts are a spectacle from anywhere with a view of Gustavia."},
+    voiles:{n:"Les Voiles de St Barth", i:"St. Barts", b:"Prestige sailing week: racing by day, concerts and beach parties by night."},
+    bastille:{n:"Bastille Day", i:"St. Barts", b:"France's national day, with fireworks over Gustavia harbour."},
+    fetesb:{n:"Fête de Saint-Barthélemy", i:"St. Barts", b:"The island's saint's day: a regatta, fireworks and local traditions in Gustavia."},
+    gourmet:{n:"St Barth Gourmet Festival", i:"St. Barts", b:"Michelin-starred guest chefs cook special dinners at island restaurants."},
+    catacup:{n:"St Barth Cata Cup", i:"St. Barts", b:"Formula 18 catamaran racing off St Jean with top international crews."},
+    nye:{n:"New Year's Eve in Gustavia", i:"St. Barts", b:"Superyachts fill the harbour and fireworks light the bay. The busiest week of the year."},
+    moonsplash:{n:"Moonsplash", i:"Anguilla", b:"Bankie Banx's reggae and roots music festival at the Dune Preserve on Rendezvous Bay, running since 1991."},
+    delmar:{n:"Festival del Mar", i:"Anguilla", b:"Easter-weekend seafood festival at Island Harbour, with boat races, swimming and live music."},
+    angday:{n:"Anguilla Day", i:"Anguilla", b:"Anguilla's national day, opening with the round-the-island boat race from Sandy Ground."},
+    summer:{n:"Anguilla Summer Festival", i:"Anguilla", b:"A month of boat racing (Anguilla's national sport), J'ouvert, pageants, calypso and the Grand Parade, peaking around August Monday."}
+  };
+  var EVS = [
+    ["gourmet",["2026-11-09","2026-11-15"]],["stmday",["2026-11-11"]],["catacup",["2026-11-16","2026-11-23"]],["nye",["2026-12-31"]],
+    ["sbmusic",null,"2027-01","Mid-January · dates TBA"],["carnF",["2027-01-30","2027-02-10"]],["sbcarn",["2027-02-09"]],
+    ["heineken",["2027-03-04","2027-03-07"]],["moonsplash",null,"2027-03","March · dates TBA"],["bucket",["2027-03-17","2027-03-21"]],["sxmfest",["2027-03-17","2027-03-21"]],
+    ["delmar",["2027-03-26","2027-03-28"],0,0,1],["voiles",null,"2027-04","April · dates TBA"],["carnD",["2027-04-30"]],["angday",["2027-05-30"]],
+    ["emanc",["2027-07-01"]],["bastille",["2027-07-14"]],["summer",["2027-08-02"],0,"Mid-July to early August · August Monday Aug 2",0],["fetesb",["2027-08-24"]],
+    ["stmday",["2027-11-11"]],["gourmet",null,"2027-11","November · dates TBA"],["catacup",null,"2027-11","November · dates TBA"],["nye",["2027-12-31"]],
+    ["sbmusic",null,"2028-01","Mid-January · dates TBA"],["carnF",["2028-02-29"],0,"Carnival peaks Mardi Gras, Feb 29",1],["sbcarn",["2028-02-29"]],
+    ["heineken",["2028-03-02","2028-03-05"]],["moonsplash",null,"2028-03","March · dates TBA"],["bucket",null,"2028-03","March · dates TBA"],["sxmfest",null,"2028-03","March · dates TBA"],
+    ["delmar",["2028-04-14","2028-04-16"],0,0,1],["voiles",null,"2028-04","April · dates TBA"],["carnD",["2028-04-30"]],["angday",["2028-05-30"]],
+    ["emanc",["2028-07-01"]],["bastille",["2028-07-14"]],["summer",["2028-08-07"],0,"Mid-July to early August · August Monday Aug 7",0],["fetesb",["2028-08-24"]],
+    ["stmday",["2028-11-11"]],["gourmet",null,"2028-11","November · dates TBA"],["catacup",null,"2028-11","November · dates TBA"],["nye",["2028-12-31"]],
+    ["sbmusic",null,"2029-01","Mid-January · dates TBA"],["carnF",["2029-02-13"],0,"Carnival peaks Mardi Gras, Feb 13",1],["sbcarn",["2029-02-13"]],
+    ["heineken",["2029-03-01","2029-03-04"]],["moonsplash",null,"2029-03","March · dates TBA"],["bucket",null,"2029-03","March · dates TBA"],["sxmfest",null,"2029-03","March · dates TBA"],
+    ["delmar",["2029-03-30","2029-04-01"],0,0,1],["voiles",null,"2029-04","April · dates TBA"],["carnD",["2029-04-30"]],["angday",["2029-05-30"]],
+    ["emanc",["2029-07-01"]],["bastille",["2029-07-14"]],["summer",["2029-08-06"],0,"Mid-July to early August · August Monday Aug 6",0],["fetesb",["2029-08-24"]],
+    ["stmday",["2029-11-11"]],["gourmet",null,"2029-11","November · dates TBA"],["catacup",null,"2029-11","November · dates TBA"],["nye",["2029-12-31"]]
+  ].map(function(r,ix){ var d=r[1]; return {ix:ix, k:r[0], from:d?d[0]:null, to:d?(d[1]||d[0]):null, ym:d?d[0].slice(0,7):r[2], text:(d?r[3]:r[3])||(d?0:r[3]), exp:!!r[4]}; });
+  EVS.forEach(function(e){ if(!e.from && !e.text) e.text = e.ym; });
+  var EVDAY = new Map();
+  EVS.forEach(function(e){ if(!e.from) return; for (var d=e.from; d<=e.to; d=addDays(d,1)){ if(!EVDAY.has(d)) EVDAY.set(d,[]); EVDAY.get(d).push(e); } });
+  var MS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function evRange(e){
+    if (!e.from) return e.text;
+    var a=e.from.split("-"), b=e.to.split("-"), s=MS[+a[1]-1]+" "+(+a[2]);
+    if (e.to===e.from) return s;
+    return a[1]===b[1] ? s+"–"+(+b[2]) : s+" – "+MS[+b[1]-1]+" "+(+b[2]);
+  }
+  function evTagCls(i){ return i==="St. Barts"?"evtag sb":(i==="Anguilla"?"evtag ax":"evtag"); }
+  function renderEvents(){
+    var list = EVS.filter(function(e){ return e.ym.slice(0,4)===String(year) && (e.to||e.ym+"-31") >= TODAY; });
+    $("evTitle").innerHTML = 'Worth planning around <i>in '+year+'</i>';
+    $("evStrip").innerHTML = list.length ? list.map(function(e){
+      var D=EVDEF[e.k], stat = e.from ? (e.exp ? "Expected · usual timing" : "<b>Confirmed</b>") : "Dates not yet announced";
+      return '<button type="button" class="evc" data-ev="'+e.ix+'"><span class="'+evTagCls(D.i)+'">'+esc(D.i)+'</span><span class="evwhen">'+esc(e.from?evRange(e):(MONTHS[+e.ym.slice(5)-1]))+'</span><span class="evname">'+esc(D.n)+'</span><span class="evstat">'+stat+'</span></button>';
+    }).join("") : '<p class="tip">Nothing else on the island calendar this year.</p>';
+  }
+  var evOpen = null;
+  function openEv(e){
+    var D=EVDEF[e.k]; evOpen=e;
+    $("evcTag").className=evTagCls(D.i); $("evcTag").textContent=D.i;
+    $("evcName").textContent=D.n;
+    $("evcWhen").textContent = e.from ? evRange(e)+", "+e.from.slice(0,4)+(e.text?" · "+e.text:"") : e.text+" · "+e.ym.slice(0,4);
+    $("evcBlurb").textContent=D.b;
+    $("evcNote").textContent = !e.from ? "The organisers haven't announced dates yet. Check closer to the time before you book flights around it."
+      : (e.exp ? "These dates follow the usual pattern but aren't announced yet. Check before you book flights around it." : "");
+    $("evcLink").hidden=!D.u; if (D.u) $("evcLink").href=D.u;
+    $("evcShow").hidden=!e.from;
+    var dl=$("evCard"); if (dl.showModal) dl.showModal(); else dl.setAttribute("open","");
+  }
+  function closeEv(){ var dl=$("evCard"); if (dl.close) dl.close(); else dl.removeAttribute("open"); }
+  $("evStrip").addEventListener("click", function(ev){ var c=ev.target.closest(".evc"); if (c) openEv(EVS[+c.dataset.ev]); });
+  $("evcX").addEventListener("click", closeEv);
+  $("evCard").addEventListener("click", function(ev){ if (ev.target===this) closeEv(); });
+  $("evcShow").addEventListener("click", function(){
+    var e=evOpen; closeEv(); if (!e||!e.from) return;
+    var first=document.querySelector('.d[data-d="'+e.from+'"]'); if (!first) return;
+    first.closest(".month").scrollIntoView({behavior:"smooth", block:"center"});
+    for (var d=e.from; d<=e.to; d=addDays(d,1)){ var b=document.querySelector('.d[data-d="'+d+'"]'); if (b){ b.classList.remove("flash"); void b.offsetWidth; b.classList.add("flash"); } }
+  });
+
   /* ---------- calendar ---------- */
   ["years","yearsBottom"].forEach(function(gid){
     YEARS.forEach(function(y){
@@ -496,13 +637,16 @@ var NOTIFY_CC = "renee.lemley@mac.com";
         else if (b){ cls.push(b.status==="requested"?"req":"conf"); label += b.status==="requested"?", requested":", reserved"; }
         else open++;
         if (selIn && ((selOut && ds>=selIn && ds<=selOut) || ds===selIn)) cls.push((ds===selIn||ds===selOut)?"selend":"sel");
+        var evs = EVDAY.get(ds);
+        if (evs){ cls.push("ev"); if (evs.every(function(x){return x.exp;})) cls.push("exp"); label += ", "+evs.map(function(x){return EVDEF[x.k].n;}).join(" & "); }
         if (ds===TODAY) cls.push("today");
-        cells += '<button type="button" class="'+cls.join(" ")+'" data-d="'+ds+'" '+(dis?"disabled":"")+' aria-label="'+esc(label)+'">'+d+'</button>';
+        cells += '<button type="button" class="'+cls.join(" ")+'" data-d="'+ds+'" '+(dis?"disabled":"")+' aria-label="'+esc(label)+'"'+(evs?' title="'+esc(evs.map(function(x){return EVDEF[x.k].n;}).join(" · "))+'"':'')+'>'+d+'</button>';
       }
       var past = new Date(Date.UTC(year,m+1,0)) < parse(TODAY);
       html += '<div class="month"><h4>'+MONTHS[m]+'<small>'+(past?"Past":open+" open nights")+'</small></h4><div class="grid">'+cells+'</div></div>';
     }
     $("months").innerHTML = html;
+    renderEvents();
   }
 
   $("months").addEventListener("click", function(e){

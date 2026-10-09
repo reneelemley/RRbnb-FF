@@ -33,6 +33,7 @@ Two audiences, one villa, one shared availability calendar:
   in the footer of `/stay/`), get an email sign-in link from Supabase, and can confirm,
   release or **change the dates of** any stay, add a stay directly as Reserved, block and
   move blocked dates, and add or turn off access codes — no code edits needed.
+- **Island events** on `/stay/` (gold dots on calendar days + "On the islands" cards) come from the `EVDEF` / `EVS` lists in `stay/index.html` ("island events" block). Add or update dates there; `exp` = expected (hollow dot), no dates = "dates TBA" card only. Research notes: R&R Guides project `nodes/corridor/events-2027-2029.md`.
 - Access today: one shared friends & family code, `FRIENDSOFR&R` (case-insensitive).
 - New requests email `ryan@gusroberts.net` (cc `renee.lemley@mac.com`) through
   FormSubmit (formsubmit.co). The first ever submission sends a one-time activation
