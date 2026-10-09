@@ -210,7 +210,7 @@
     <div class="panel">
       <label class="gate-label" for="code">Friends &amp; family code</label>
       <input id="code" class="code-in" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="• • • • • •" maxlength="40" />
-      <button class="btn btn-gold unlock" id="go" type="button">See the calendar →</button>
+      <button class="btn btn-gold unlock" id="go" type="button">See the Calendar →</button>
       <p class="err" id="gateErr" role="alert"></p>
       <p class="hint">Please keep the code within friends &amp; family.</p>
     </div>
@@ -262,7 +262,7 @@
           <div class="f"><label for="fNotes">Anything we should know <span style="text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></label><textarea id="fNotes" maxlength="2000"></textarea></div>
           <label class="commit"><input type="checkbox" id="cCommit"><span>We are certain we're coming on these dates. This is not a maybe.</span></label>
           <div class="msg err" id="formErr" role="alert" hidden></div>
-          <button class="btn btn-gold" id="submitBtn" type="submit" disabled>Send request →</button>
+          <button class="btn btn-gold" id="submitBtn" type="submit" disabled>Send Request →</button>
           <div class="msg ok" id="formOk" role="status" hidden></div>
         </form>
 
@@ -271,7 +271,7 @@
           <div><span class="eyebrow plain">Hosts only</span><h3>Block dates</h3></div>
           <p class="hint" id="blkSel">Select dates on the calendar, then block them here. Guests see them as Unavailable.</p>
           <div class="f"><label for="blkReason">Private note</label><input id="blkReason" type="text" maxlength="200" placeholder="e.g. We're away"></div>
-          <button class="btn btn-solid sm" id="blkBtn" type="button" disabled>Block these dates</button>
+          <button class="btn btn-solid sm" id="blkBtn" type="button" disabled>Block These Dates</button>
           <p class="hint" id="blkMsg" hidden></p>
           <div class="host-tools">
             <div><span class="eyebrow plain">Add a stay</span></div>
@@ -279,7 +279,7 @@
             <div class="row2"><div class="f"><label for="addName">Name</label><input id="addName" type="text" maxlength="120" placeholder="e.g. Mom &amp; Dad"></div>
               <div class="f"><label for="addParty">Guests</label><input id="addParty" type="number" min="1" max="20" value="2"></div></div>
             <div class="f"><label for="addEmail">Email <span style="text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></label><input id="addEmail" type="email" maxlength="160"></div>
-            <button class="btn btn-solid sm" id="addStay" type="button" disabled>Add stay on selected dates</button>
+            <button class="btn btn-solid sm" id="addStay" type="button" disabled>Add Stay on Selected Dates</button>
             <p class="hint" id="addMsg" hidden></p>
           </div>
           <div class="host-tools">
@@ -289,7 +289,7 @@
               <div class="f"><label for="newLabel">Who it's for</label><input id="newLabel" type="text" maxlength="80" placeholder="e.g. Mom"></div>
               <div class="f"><label for="newCode">Code</label><input id="newCode" type="text" maxlength="40" placeholder="e.g. MOM-2026" style="text-transform:uppercase"></div>
             </div>
-            <button class="btn btn-line sm" id="addCode" type="button">Add code</button>
+            <button class="btn btn-line sm" id="addCode" type="button">Add Code</button>
             <p class="hint" id="codeMsg" hidden></p>
           </div>
         </div>
@@ -319,7 +319,7 @@
 
     <div class="hostbar" id="hostBar" hidden>
       <span id="hostWho">Signed in as host</span>
-      <button class="btn sm" id="signOut" type="button">Sign out</button>
+      <button class="btn sm" id="signOut" type="button">Sign Out</button>
     </div>
   </div>
 </section>
@@ -334,7 +334,7 @@
   <div class="wrap">
     <div class="panel host-login">
       <div class="f"><label for="hostEmail">Your email</label><input id="hostEmail" type="email" autocomplete="email"></div>
-      <button class="btn btn-solid unlock" id="sendLink" type="button">Email me a sign-in link</button>
+      <button class="btn btn-solid unlock" id="sendLink" type="button">Email Me a Sign-In Link</button>
       <p class="err" id="hostErr" role="alert"></p>
       <p class="hint">The link comes from Supabase. If it doesn't arrive in a minute, check Junk.</p>
       <p class="hint"><a href="#" id="backToGate" style="color:var(--gold);font-weight:600;text-decoration:none">← Back</a></p>
@@ -577,7 +577,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     } else {
       r = await sb.rpc("request_booking", { p_code: code || "", p_check_in: selIn, p_check_out: selOut, p_name: name, p_email: email, p_party: party, p_notes: notes });
     }
-    $("submitBtn").textContent = "Send request →";
+    $("submitBtn").textContent = "Send Request →";
     if (r.error){
       var m = r.error.message || "";
       if (m.indexOf("dates_taken")>-1){ selIn=selOut=null; await refresh(); return formError("Someone just took some of those dates. Pick again."); }
@@ -599,8 +599,8 @@ var NOTIFY_CC = "renee.lemley@mac.com";
   /* ---------- hosts: change dates ---------- */
   var moving = null;   // {id, table, who}
   function moveBtn(b, table){
-    var label = "Change dates";
-    if (moving && moving.id===b.id) label = (selIn && selOut) ? "Move to "+fmtShort(selIn)+" – "+fmtShort(selOut) : "Pick new dates above…";
+    var label = "Change Dates";
+    if (moving && moving.id===b.id) label = (selIn && selOut) ? "Move to "+fmtShort(selIn)+" – "+fmtShort(selOut) : "Pick New Dates Above…";
     return '<button class="btn btn-line sm" data-act="move" data-table="'+table+'" data-id="'+b.id+'">'+esc(label)+'</button>';
   }
   function renderMove(){
@@ -639,10 +639,10 @@ var NOTIFY_CC = "renee.lemley@mac.com";
         who = esc(b.name)+" · "+esc(b.party)+" guest"+(b.party>1?"s":"")+" · <a href=\"mailto:"+esc(b.email)+"\" style=\"color:var(--gold)\">"+esc(b.email)+"</a>"
             + (b.code_label ? " · code: "+esc(b.code_label) : "") + (b.notes ? "<br>“"+esc(b.notes)+"”" : "");
         if (b.status==="requested") acts += '<button class="btn btn-solid sm" data-act="confirm" data-id="'+b.id+'">Confirm</button>';
-        acts += moveBtn(b,"bookings") + '<button class="btn danger sm" data-act="release" data-id="'+b.id+'">Release dates</button>';
+        acts += moveBtn(b,"bookings") + '<button class="btn danger sm" data-act="release" data-id="'+b.id+'">Release Dates</button>';
       } else {
         var m = mineIds[b.check_in+"|"+b.check_out];
-        if (m){ pill += '<span class="pill mine">Yours</span>'; acts = '<button class="btn danger sm" data-act="cancel" data-id="'+esc(m.id)+'">Cancel my request</button>'; }
+        if (m){ pill += '<span class="pill mine">Yours</span>'; acts = '<button class="btn danger sm" data-act="cancel" data-id="'+esc(m.id)+'">Cancel My Request</button>'; }
       }
       return '<div class="stay"><div><div class="when">'+when+pill+'</div>'+(who?'<div class="who">'+who+'</div>':'')+'</div><div class="acts">'+acts+'</div></div>';
     }).join("");
@@ -681,7 +681,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
       r = await sb.rpc("cancel_booking", { p_id: id, p_token: m ? m.token : "00000000-0000-0000-0000-000000000000" });
       if (!r.error) saveMine(myStays().filter(function(x){ return x.id!==id; }));
     }
-    if (r && r.error){ btn.disabled = false; btn.textContent = "Didn't save, try again"; return; }
+    if (r && r.error){ btn.disabled = false; btn.textContent = "Didn't Save, Try Again"; return; }
     refresh();
   });
 
