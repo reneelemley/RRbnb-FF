@@ -387,15 +387,19 @@
   <div class="wrap head">
     <span class="eyebrow">Hosts</span>
     <h1 class="h1" style="font-size:clamp(34px,4vw,48px)">Host sign-in</h1>
-    <p class="lead">For Ryan and Renée. We'll email you a one-time sign-in link.</p>
+    <p class="lead">For Ryan and Renée. We'll email you a sign-in code. Type it in here, and this browser stays signed in.</p>
   </div>
   <div class="wrap">
     <div class="panel host-login">
       <div class="f"><label for="hostEmail">Your email</label><input id="hostEmail" type="email" autocomplete="email"></div>
-      <button class="btn btn-solid unlock" id="sendLink" type="button">Email Me a Sign-In Link</button>
+      <button class="btn btn-solid unlock" id="sendLink" type="button">Email Me a Sign-In Code</button>
+      <div id="codeStep" hidden>
+        <div class="f" style="margin-top:18px"><label for="hostCode">Code from the email</label><input id="hostCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" style="letter-spacing:.3em;font-size:22px;text-align:center"></div>
+        <button class="btn btn-gold unlock" id="verifyCode" type="button">Sign In</button>
+      </div>
       <p class="err" id="hostErr" role="alert"></p>
-      <p class="hint">The link comes from Supabase. If it doesn't arrive in a minute, check Junk.</p>
-      <p class="hint"><a href="#" id="backToGate" style="color:var(--gold);font-weight:600;text-decoration:none">← Back</a></p>
+      <p class="hint">The email comes from Supabase. If it doesn't arrive in a minute, check Junk. There's a limit of two sign-in emails an hour, so use the newest one you have.</p>
+      <p class="hint"><a href="#" id="haveCode" style="color:var(--gold);font-weight:600;text-decoration:none">I already have a code</a> · <a href="#" id="backToGate" style="color:var(--gold);font-weight:600;text-decoration:none">← Back</a></p>
     </div>
   </div>
 </section>
@@ -896,17 +900,47 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     show("gate", false); show("vault", false); show("hostLogin", true); window.scrollTo(0,0);
   });
   $("backToGate").addEventListener("click", function(e){ e.preventDefault(); show("hostLogin", false); show("gate", true); });
+  /* Set CODE_SIGNIN = true once the Supabase "Magic link or OTP" email template includes {{ .Token }}
+     (editing templates requires custom SMTP). Until then hosts sign in with the emailed link. */
+  var CODE_SIGNIN = false;
+  if (!CODE_SIGNIN){
+    $("sendLink").textContent = "Email Me a Sign-In Link";
+    $("haveCode").hidden = true; $("haveCode").nextSibling.textContent = "";
+    document.querySelector("#hostLogin .lead").textContent = "For Ryan and Renée. We'll email you a one-time sign-in link. Open it on this same device and browser.";
+  }
+  function hostMsg(t, ok){ $("hostErr").style.color = ok ? "var(--ink-2)" : ""; $("hostErr").textContent = t; }
+  function showCodeStep(){ show("codeStep", true); setTimeout(function(){ $("hostCode").focus(); }, 50); }
+  try { var lastHost = localStorage.getItem("rr_host_email"); if (lastHost) $("hostEmail").value = lastHost; } catch(e){}
   $("sendLink").addEventListener("click", async function(){
-    var em = $("hostEmail").value.trim(); $("hostErr").textContent = "";
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ $("hostErr").textContent = "Enter your email."; return; }
+    var em = $("hostEmail").value.trim(); hostMsg("");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ hostMsg("Enter your email."); return; }
+    try { localStorage.setItem("rr_host_email", em); } catch(e){}
     $("sendLink").disabled = true;
     var r = await sb.auth.signInWithOtp({ email: em, options: { emailRedirectTo: location.origin + location.pathname, shouldCreateUser: true } });
     $("sendLink").disabled = false;
-    $("hostErr").style.color = r.error ? "" : "var(--ink-2)";
-    $("hostErr").textContent = !r.error ? "Check your inbox for the sign-in link."
-      : (r.error.status===429 ? "Too many sign-in emails in the last hour (the free email service allows two). Use the newest link already in your inbox, or try again in an hour."
-      : "That didn't send. Try again in a minute.");
+    if (!r.error){
+      if (CODE_SIGNIN){ hostMsg("Sent. Type the code from the email below.", true); showCodeStep(); }
+      else hostMsg("Sent. Open the link on this device, in this browser. It only works once.", true);
+      return;
+    }
+    if (r.error.status===429){ hostMsg("You've hit the limit of two sign-in emails an hour. Try again later"+(CODE_SIGNIN?", or type a code from the last hour below.":".")); if (CODE_SIGNIN) showCodeStep(); return; }
+    hostMsg("That didn't send. Check the email address and try again in a minute.");
   });
+  $("haveCode").addEventListener("click", function(e){ e.preventDefault(); showCodeStep(); });
+  async function doVerify(){
+    var em = $("hostEmail").value.trim(), tok = $("hostCode").value.replace(/\D/g,"");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ hostMsg("Enter your email above first."); return; }
+    if (tok.length < 6){ hostMsg("Enter the code from the email."); return; }
+    $("verifyCode").disabled = true; hostMsg("Checking…", true);
+    var r = await sb.auth.verifyOtp({ email: em, token: tok, type: "email" });
+    $("verifyCode").disabled = false;
+    if (r.error){ hostMsg("That code didn't work. It may have expired or been replaced by a newer one; use the code from the most recent email."); return; }
+    try { localStorage.setItem("rr_host_email", em); } catch(e){}
+    if (!(await applySession(r.data.session))) hostMsg("Signed in, but "+em+" isn't on the host list. Use the email Ryan or Renée signs in with.");
+  }
+  $("verifyCode").addEventListener("click", doVerify);
+  $("hostCode").addEventListener("keydown", function(e){ if (e.key==="Enter") doVerify(); });
+
   $("signOut").addEventListener("click", async function(){ await sb.auth.signOut(); location.reload(); });
 
   async function applySession(session){
@@ -926,6 +960,14 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     var s = await sb.auth.getSession();
     if (await applySession(s.data.session)) return;
     sb.auth.onAuthStateChange(function(ev, session){ if (ev==="SIGNED_IN" && !isHost) applySession(session); });
+    var hp = new URLSearchParams(location.hash.replace(/^#/,"")), hErr = hp.get("error_code") || hp.get("error");
+    if (hErr){
+      history.replaceState(null, "", location.pathname);
+      show("gate", false); show("hostLogin", true); render();
+      if (CODE_SIGNIN){ hostMsg("That sign-in link was already used or has expired. Use the 6-digit code from the email instead."); showCodeStep(); }
+      else hostMsg("That sign-in link was already used or has expired. Links only work once, and some email services (like Microsoft 365) open them automatically to scan them. Request a new one below.");
+      return;
+    }
     if (location.hash === "#host"){ show("gate", false); show("hostLogin", true); render(); return; }
     var saved = store.get("rr_code", true);
     if (saved){
