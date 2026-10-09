@@ -42,12 +42,12 @@ Two audiences, one villa, one shared availability calendar:
 - A GitHub Action (`.github/workflows/keep-supabase-awake.yml`) pings Supabase twice a week
   so the free project never pauses. GitHub turns off scheduled workflows after 60 days
   with no repo activity — if the calendar ever stops loading, re-enable it under Actions.
-- Auth "Site URL" in Supabase is `https://ryangusroberts.github.io/rrbnb-site/stay/`.
-  If the site moves to a custom domain, update it there and add the new URL.
+- Auth "Site URL" in Supabase is still `https://ryangusroberts.github.io/rrbnb-site/stay/`
+  (Ryan's copy). Update it when the domain switches (see Hosting below).
 
 ## Stack & structure
 
-- **Plain HTML/CSS/JS. No build step.** The only external script is supabase-js (CDN) on `/stay/`. Each page is a self-contained `index.html` with
+- **Plain HTML/CSS/JS. No build step.** External scripts: supabase-js (CDN) on `/stay/`, and MapLibre GL + OpenFreeMap tiles for the home-page map. Each page is a self-contained `index.html` with
   its CSS and JS inlined. This mirrors how the owners' other site is built.
 - Pages: `/` (home), `/stay/` (coded family page), `/book/` (public guest page).
 - **Design system** lives in the `:root` CSS variables at the top of each page —
@@ -79,15 +79,31 @@ Two audiences, one villa, one shared availability calendar:
 
 ## Hosting & publishing
 
+- **The live site is Renée's repo: `reneelemley/RRbnb-FF`** (GitHub Pages, currently
+  https://reneelemley.github.io/RRbnb-FF/, soon **rrbnb.com**). Pushing to its `main`
+  republishes in ~1–2 minutes. Ryan is a collaborator on it.
+- `ryangusroberts/rrbnb-site` is Ryan's working copy (same history). Changes made there
+  reach the live site only when synced: `cd rrbnb-site && git pull && git push
+  https://github.com/reneelemley/RRbnb-FF.git main` (a normal fast-forward push, never force).
 - **Private by design:** every page is `noindex, nofollow` and `robots.txt` disallows all.
-  Link previews (Open Graph) use `assets/og-image.jpg` with absolute github.io URLs.
-- **Moving to rrbnb.com (Renée's domain):** update the `og:url`/`og:image` URLs on all three
-  pages, add `CNAME`, set the domain in Settings → Pages, and update the Supabase Auth Site URL.
+  Link previews (Open Graph) use `assets/og-image.jpg` with absolute URLs.
 
-- Hosted on **GitHub Pages**. Pushing to `main` republishes in ~1–2 minutes.
-- Custom domain: rename `CNAME.example` → `CNAME`, put the real domain inside, and set
-  it in the repo's **Settings → Pages**. No custom domain yet? Leave `CNAME.example`
-  as-is (it does nothing) and the site lives at the `github.io` URL.
+### Switching the live site to rrbnb.com (domain is at GoDaddy)
+Do these in order. Don't add `CNAME` before step 1 is done, or the github.io address
+starts redirecting to a domain that doesn't answer yet.
+1. **GoDaddy DNS** for rrbnb.com: four `A` records on `@` → 185.199.108.153,
+   185.199.109.153, 185.199.110.153, 185.199.111.153; one `CNAME` record `www` →
+   `reneelemley.github.io`. Remove GoDaddy's default parked/forwarding records for `@`/`www`.
+2. **Repo:** rename `CNAME.example` → `CNAME` containing just `rrbnb.com`.
+3. **Settings → Pages** (Renée only — collaborators can't see it): Custom domain
+   `rrbnb.com`, save, wait for the DNS check, then tick **Enforce HTTPS**.
+4. **Link previews:** in `index.html`, `stay/index.html`, `book/index.html` change the
+   `og:url`/`og:image` URLs from `https://ryangusroberts.github.io/rrbnb-site/` to `https://rrbnb.com/`.
+5. **Supabase** (project villa-rr → Authentication → URL Configuration): Site URL
+   `https://rrbnb.com/stay/`; add Redirect URLs `https://rrbnb.com/stay/` and
+   `https://reneelemley.github.io/RRbnb-FF/stay/`. Host sign-in links use the page's own
+   address, which only works if it's on that list.
+6. Check: open https://rrbnb.com, enter the family code on /stay/, and try a host sign-in.
 
 ## Conventions & guardrails
 
