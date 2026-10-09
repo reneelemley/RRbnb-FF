@@ -901,7 +901,9 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     var r = await sb.auth.signInWithOtp({ email: em, options: { emailRedirectTo: location.origin + location.pathname, shouldCreateUser: true } });
     $("sendLink").disabled = false;
     $("hostErr").style.color = r.error ? "" : "var(--ink-2)";
-    $("hostErr").textContent = r.error ? "That didn't send. Try again in a minute." : "Check your inbox for the sign-in link.";
+    $("hostErr").textContent = !r.error ? "Check your inbox for the sign-in link."
+      : (r.error.status===429 ? "Too many sign-in emails in the last hour (the free email service allows two). Use the newest link already in your inbox, or try again in an hour."
+      : "That didn't send. Try again in a minute.");
   });
   $("signOut").addEventListener("click", async function(){ await sb.auth.signOut(); location.reload(); });
 
