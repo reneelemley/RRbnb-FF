@@ -107,6 +107,7 @@ language sql stable security definer set search_path = public as $$
   union all
   select k.check_in, k.check_out, 'blocked', 0 from public.blocks k where k.check_out >= current_date;
 $$;
+-- Blocks are inclusive too: a block from Mar 1 to Mar 3 holds the 1st, 2nd AND 3rd.
 
 create or replace function public.request_booking(
   p_code text, p_check_in date, p_check_out date,
@@ -130,7 +131,7 @@ begin
     raise exception 'too_far';
   end if;
   if exists (select 1 from public.blocks
-             where daterange(check_in, check_out) && daterange(p_check_in, p_check_out + 1)) then
+             where daterange(check_in, check_out + 1) && daterange(p_check_in, p_check_out + 1)) then
     raise exception 'dates_taken';
   end if;
 

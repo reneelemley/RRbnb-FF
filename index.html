@@ -865,8 +865,8 @@
       var pad=function(n){return String(n).padStart(2,'0');}, iso=function(d){return d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1)+'-'+pad(d.getUTCDate());};
       var parts=new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).split('-');
       var day=new Date(Date.UTC(+parts[0],+parts[1]-1,+parts[2]+1)); // from tomorrow
-      // stays hold their checkout day plus turnover days (buffer_days); blocks end the day before their end date
-      var taken={}; rows.forEach(function(b){ var end=new Date(b.check_out+'T00:00:00Z'); if(b.status!=='blocked') end.setUTCDate(end.getUTCDate()+1+(b.buffer_days==null?2:+b.buffer_days));
+      // stays hold their checkout day plus turnover days (buffer_days); blocks include their last day
+      var taken={}; rows.forEach(function(b){ var end=new Date(b.check_out+'T00:00:00Z'); end.setUTCDate(end.getUTCDate()+1+(b.status==='blocked'?0:(b.buffer_days==null?2:+b.buffer_days)));
         for(var d=new Date(b.check_in+'T00:00:00Z'); d<end; d.setUTCDate(d.getUTCDate()+1)) taken[iso(d)]=1; });
       var MIN=3, start=null, len=0, limit=540;
       for(var i=0;i<limit;i++){ var k=iso(day); if(!taken[k]){ if(!start) start=new Date(day); len++; if(len>=MIN){ break; } } else { start=null; len=0; } day.setUTCDate(day.getUTCDate()+1); }

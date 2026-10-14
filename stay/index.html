@@ -524,14 +524,14 @@ var NOTIFY_CC = "renee.lemley@mac.com";
   setInterval(function(){ if (!$("vault").hidden && !document.hidden) refresh(); }, 30000);
 
   /* Turnover rule: a stay holds check-in through the checkout day, then TURNOVER days are blocked.
-     The database enforces this too (bookings.buffer_days, default 2). Blocks keep their end date free. */
+     The database enforces this too (bookings.buffer_days, default 2). Blocks include their last day. */
   var TURNOVER = 2;
   function bufOf(b){ return (b.buffer_days==null) ? TURNOVER : +b.buffer_days; }
   function nightMap(skipId){
     var m = new Map();
     taken.forEach(function(b){
       if (skipId && b.id===skipId) return;
-      if (b.status==="blocked"){ for (var d=b.check_in; d<b.check_out; d=addDays(d,1)) if (!m.has(d) || m.get(d).turnover) m.set(d,b); return; }
+      if (b.status==="blocked"){ for (var d=b.check_in; d<=b.check_out; d=addDays(d,1)) if (!m.has(d) || m.get(d).turnover) m.set(d,b); return; }
       for (var d2=b.check_in; d2<=b.check_out; d2=addDays(d2,1)) m.set(d2,b);
       for (var k=1; k<=bufOf(b); k++){ var t=addDays(b.check_out,k); if (!m.has(t)) m.set(t,{status:"blocked", turnover:true, of:b}); }
     });
@@ -543,8 +543,8 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     for (var k=1; k<=TURNOVER; k++){ var v=map.get(addDays(b,k)); if (v && !v.turnover && v.status!=="blocked") return true; }
     return false;
   }
-  // a BLOCK: nights arrival..end-1 can't sit on a stay (it may cover turnover days)
-  function clashBlock(a,b,map){ for (var d=a; d<b; d=addDays(d,1)){ var v=map.get(d); if (v && !v.turnover) return true; } return false; }
+  // a BLOCK: every day first..last (inclusive) can't sit on a stay (it may cover turnover days)
+  function clashBlock(a,b,map){ for (var d=a; d<=b; d=addDays(d,1)){ var v=map.get(d); if (v && !v.turnover) return true; } return false; }
 
   /* ---------- island events ----------
      Edit here. d = [from, to] (to optional). exp:true = expected (usual pattern, not yet announced).
@@ -797,7 +797,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     if (!up.length){ el.innerHTML = '<div class="empty">No stays on the calendar yet. Pick dates above to send the first request.</div>'; return; }
     el.innerHTML = up.map(function(b){
       var n = diff(b.check_in, b.check_out);
-      var when = esc(fmtShort(b.check_in))+" to "+esc(fmt(b.check_out))+" · "+nightsLabel(n);
+      var when = esc(fmtShort(b.check_in))+" to "+esc(fmt(b.check_out))+" · "+(b.status==="blocked" ? (n+1)+" day"+(n?"s":"") : nightsLabel(n));
       if (b.status==="blocked"){
         return '<div class="stay"><div><div class="when">'+when+'<span class="pill blocked">Blocked</span></div><div class="who">'+(b.reason?esc(b.reason):"No note")+' · Guests see Unavailable</div></div>'
              + '<div class="acts">'+moveBtn(b,"blocks")+'<button class="btn danger sm" data-act="unblock" data-id="'+b.id+'">Unblock</button></div></div>';
