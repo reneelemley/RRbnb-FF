@@ -119,6 +119,15 @@
   .d.sel{background:var(--sea-soft);color:var(--ink);font-weight:700;}
   .d.selend{background:var(--sea);color:#fff;font-weight:700;}
   .d.today{box-shadow:inset 0 0 0 1.5px var(--ink);}
+  /* each stay is outlined as one band (arrival to departure), so back-to-back stays read separately */
+  .d.band{border-radius:0;}
+  .d.band::before{content:"";position:absolute;top:0;bottom:0;left:-1.5px;right:-1.5px;border:2px solid var(--gold);border-left:0;border-right:0;pointer-events:none;}
+  .d.band.s-in::before{left:0;border-left:2px solid var(--gold);border-radius:9px 0 0 9px;}
+  .d.band.s-out::before{right:0;border-right:2px solid var(--gold);border-radius:0 9px 9px 0;}
+  .d.band.s-in.s-out::before{border-radius:9px;}
+  .d.band.s-in{border-top-left-radius:9px;border-bottom-left-radius:9px;}
+  .d.band.s-out{border-top-right-radius:9px;border-bottom-right-radius:9px;}
+  .d.conf.band:not(.s-out){box-shadow:3px 0 0 var(--stone);} /* fill the gap so a reserved stay reads as one solid band */
 
 
   /* ---- island events ---- */
@@ -658,7 +667,11 @@ var NOTIFY_CC = "renee.lemley@mac.com";
         var ds = year+"-"+pad(m+1)+"-"+pad(d), b = map.get(ds), cls = ["d"], dis = false, label = fmt(ds);
         if (ds < TODAY){ cls.push("past"); dis = true; }
         else if (b && b.status==="blocked"){ cls.push("blk"); if (b.turnover) cls.push("turn"); label += b.turnover ? (isHost ? ", turnover after "+(b.of.name||"a stay") : ", unavailable") : ", unavailable"; }
-        else if (b){ cls.push(b.status==="requested"?"req":"conf"); label += b.status==="requested"?", requested":", reserved"; }
+        else if (b){ cls.push(b.status==="requested"?"req":"conf", "band");
+          var col = (lead+d-1)%7;
+          if (ds===b.check_in || col===0 || d===1) cls.push("s-in");
+          if (ds===b.check_out || col===6 || d===days) cls.push("s-out");
+          label += (b.status==="requested"?", requested":", reserved") + (isHost && b.name ? " by "+b.name : "") + (ds===b.check_in?", arrival":"") + (ds===b.check_out?", departure":""); }
         else open++;
         if (selIn && ((selOut && ds>=selIn && ds<=selOut) || ds===selIn)) cls.push((ds===selIn||ds===selOut)?"selend":"sel");
         var evs = EVDAY.get(ds);
@@ -677,12 +690,16 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     var btn = e.target.closest(".d"); if (!btn || btn.disabled) return;
     var ds = btn.dataset.d, map = nightMap(moving && moving.id);
     show("formOk", false); show("formErr", false);
+    // Hosts picking fresh dates may be blocking them, which can cover turnover days, so the picker
+    // uses the looser block check. "Add as Reserved" still checks the full stay rules when clicked.
+    var blockish = moving ? moving.table==="blocks" : isHost;
+    function busy(d){ var v = map.get(d); return blockish ? !!(v && !v.turnover) : !!v; }
     if (!selIn || selOut || ds <= selIn){
-      if (map.has(ds) || ds > LAST_NIGHT){ selIn = null; selOut = null; }
+      if (busy(ds) || ds > LAST_NIGHT){ selIn = null; selOut = null; }
       else { selIn = ds; selOut = null; }
     } else {
-      var bad = (moving && moving.table==="blocks") ? clashBlock(selIn, ds, map) : clash(selIn, ds, map);
-      if (bad){ selIn = map.has(ds) ? null : ds; selOut = null; formError("Those dates run into another stay. Stays include the checkout day, with two turnover days after each one. Start again from a new arrival date."); }
+      var bad = blockish ? clashBlock(selIn, ds, map) : clash(selIn, ds, map);
+      if (bad){ selIn = busy(ds) ? null : ds; selOut = null; formError(blockish ? "Those dates run into a stay. Start again from a new first date." : "Those dates run into another stay. Stays include the checkout day, with two turnover days after each one. Start again from a new arrival date."); }
       else selOut = ds;
     }
     render();
@@ -863,7 +880,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     if (!isHost) return;
     var ready = selIn && selOut;
     $("blkSel").textContent = ready
-      ? "Selected: "+fmtShort(selIn)+" to "+fmtShort(selOut)+", "+nightsLabel(diff(selIn,selOut))+". The departure day stays open."
+      ? "Selected: "+fmtShort(selIn)+" to "+fmtShort(selOut)+", "+(diff(selIn,selOut)+1)+" days. Every day is blocked, including the last."
       : "Select dates on the calendar, then block them here. Guests see them as Unavailable.";
     $("blkBtn").disabled = !ready;
     $("addStay").disabled = !ready;
