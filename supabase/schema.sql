@@ -25,10 +25,12 @@ create table if not exists public.bookings (
   notes        text not null default '' check (length(notes) <= 2000),
   code_label   text,
   status       text not null default 'requested' check (status in ('requested','confirmed')),
+  buffer_days  int  not null default 2 check (buffer_days between 0 and 14),
   cancel_token uuid not null default gen_random_uuid(),
   created_at   timestamptz not null default now(),
   check (check_out > check_in),
-  constraint bookings_no_overlap exclude using gist (daterange(check_in, check_out) with &&)
+  -- A stay holds every day from check-in through the checkout day, plus buffer_days turnover days after.
+  constraint bookings_no_overlap exclude using gist (daterange(check_in, check_out + 1 + buffer_days) with &&)
 );
 
 create table if not exists public.blocks (
@@ -92,12 +94,18 @@ language sql stable security definer set search_path = public as $$
   where code = upper(trim(p_code)) and active;
 $$;
 
-create or replace function public.calendar()
-returns table (check_in date, check_out date, status text)
+-- Turnover rule (Oct 2026): checkout day is part of the stay, then buffer_days (default 2) are blocked.
+alter table public.bookings add column if not exists buffer_days int not null default 2 check (buffer_days between 0 and 14);
+alter table public.bookings drop constraint if exists bookings_no_overlap;
+alter table public.bookings add constraint bookings_no_overlap exclude using gist (daterange(check_in, check_out + 1 + buffer_days) with &&);
+
+drop function if exists public.calendar();
+create function public.calendar()
+returns table (check_in date, check_out date, status text, buffer_days int)
 language sql stable security definer set search_path = public as $$
-  select b.check_in, b.check_out, b.status from public.bookings b where b.check_out >= current_date
+  select b.check_in, b.check_out, b.status, b.buffer_days from public.bookings b where b.check_out + 1 + b.buffer_days > current_date
   union all
-  select k.check_in, k.check_out, 'blocked' from public.blocks k where k.check_out >= current_date;
+  select k.check_in, k.check_out, 'blocked', 0 from public.blocks k where k.check_out >= current_date;
 $$;
 
 create or replace function public.request_booking(
@@ -122,7 +130,7 @@ begin
     raise exception 'too_far';
   end if;
   if exists (select 1 from public.blocks
-             where daterange(check_in, check_out) && daterange(p_check_in, p_check_out)) then
+             where daterange(check_in, check_out) && daterange(p_check_in, p_check_out + 1)) then
     raise exception 'dates_taken';
   end if;
 

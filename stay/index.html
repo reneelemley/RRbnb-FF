@@ -114,6 +114,8 @@
   .d.req{background:repeating-linear-gradient(135deg,#C9E5E9 0 4px,transparent 4px 7px);color:var(--sea);font-weight:700;}
   .d.conf{background:var(--stone);color:#F4F7F9;}
   .d.blk{background:var(--linen-2);color:var(--ink-3);text-decoration:line-through;}
+  .d.blk.turn{background:repeating-linear-gradient(135deg,var(--linen-2) 0 4px,#fff 4px 7px);}
+  .turnnote{font-size:12.5px;color:var(--ink-3);}
   .d.sel{background:var(--sea-soft);color:var(--ink);font-weight:700;}
   .d.selend{background:var(--sea);color:#fff;font-weight:700;}
   .d.today{box-shadow:inset 0 0 0 1.5px var(--ink);}
@@ -516,17 +518,33 @@ var NOTIFY_CC = "renee.lemley@mac.com";
       if (r.error){ st.textContent = "The calendar didn't load. Refresh to try again."; return; }
       taken = r.data || [];
     }
-    st.textContent = "Tap your arrival date, then your departure date.";
+    st.textContent = "Tap your arrival date, then your departure date. Your departure day is yours too, and the two days after each stay are held for cleaning.";
     render();
   }
   setInterval(function(){ if (!$("vault").hidden && !document.hidden) refresh(); }, 30000);
 
+  /* Turnover rule: a stay holds check-in through the checkout day, then TURNOVER days are blocked.
+     The database enforces this too (bookings.buffer_days, default 2). Blocks keep their end date free. */
+  var TURNOVER = 2;
+  function bufOf(b){ return (b.buffer_days==null) ? TURNOVER : +b.buffer_days; }
   function nightMap(skipId){
     var m = new Map();
-    taken.forEach(function(b){ if (skipId && b.id===skipId) return; for (var d=b.check_in; d<b.check_out; d=addDays(d,1)) m.set(d,b); });
+    taken.forEach(function(b){
+      if (skipId && b.id===skipId) return;
+      if (b.status==="blocked"){ for (var d=b.check_in; d<b.check_out; d=addDays(d,1)) if (!m.has(d) || m.get(d).turnover) m.set(d,b); return; }
+      for (var d2=b.check_in; d2<=b.check_out; d2=addDays(d2,1)) m.set(d2,b);
+      for (var k=1; k<=bufOf(b); k++){ var t=addDays(b.check_out,k); if (!m.has(t)) m.set(t,{status:"blocked", turnover:true, of:b}); }
+    });
     return m;
   }
-  function clash(a,b,map){ for (var d=a; d<b; d=addDays(d,1)) if (map.has(d)) return true; return false; }
+  // a new or moved STAY: every day arrival..checkout must be free, and its turnover days can't land on another stay
+  function clash(a,b,map){
+    for (var d=a; d<=b; d=addDays(d,1)) if (map.has(d)) return true;
+    for (var k=1; k<=TURNOVER; k++){ var v=map.get(addDays(b,k)); if (v && !v.turnover && v.status!=="blocked") return true; }
+    return false;
+  }
+  // a BLOCK: nights arrival..end-1 can't sit on a stay (it may cover turnover days)
+  function clashBlock(a,b,map){ for (var d=a; d<b; d=addDays(d,1)){ var v=map.get(d); if (v && !v.turnover) return true; } return false; }
 
   /* ---------- island events ----------
      Edit here. d = [from, to] (to optional). exp:true = expected (usual pattern, not yet announced).
@@ -639,7 +657,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
       for (var d=1; d<=days; d++){
         var ds = year+"-"+pad(m+1)+"-"+pad(d), b = map.get(ds), cls = ["d"], dis = false, label = fmt(ds);
         if (ds < TODAY){ cls.push("past"); dis = true; }
-        else if (b && b.status==="blocked"){ cls.push("blk"); label += ", unavailable"; }
+        else if (b && b.status==="blocked"){ cls.push("blk"); if (b.turnover) cls.push("turn"); label += b.turnover ? (isHost ? ", turnover after "+(b.of.name||"a stay") : ", unavailable") : ", unavailable"; }
         else if (b){ cls.push(b.status==="requested"?"req":"conf"); label += b.status==="requested"?", requested":", reserved"; }
         else open++;
         if (selIn && ((selOut && ds>=selIn && ds<=selOut) || ds===selIn)) cls.push((ds===selIn||ds===selOut)?"selend":"sel");
@@ -663,7 +681,8 @@ var NOTIFY_CC = "renee.lemley@mac.com";
       if (map.has(ds) || ds > LAST_NIGHT){ selIn = null; selOut = null; }
       else { selIn = ds; selOut = null; }
     } else {
-      if (clash(selIn, ds, map)){ selIn = map.has(ds) ? null : ds; selOut = null; formError("Those dates cross another stay. Start again from a new arrival date."); }
+      var bad = (moving && moving.table==="blocks") ? clashBlock(selIn, ds, map) : clash(selIn, ds, map);
+      if (bad){ selIn = map.has(ds) ? null : ds; selOut = null; formError("Those dates run into another stay. Stays include the checkout day, with two turnover days after each one. Start again from a new arrival date."); }
       else selOut = ds;
     }
     render();
@@ -763,9 +782,9 @@ var NOTIFY_CC = "renee.lemley@mac.com";
   }
   async function doMove(id, table){
     if (!selIn || !selOut) return "Pick the new dates on the calendar first.";
-    if (clash(selIn, selOut, nightMap(id))) return "Those dates overlap another stay or block.";
+    if (table==="blocks" ? clashBlock(selIn, selOut, nightMap(id)) : clash(selIn, selOut, nightMap(id))) return "Those dates overlap another stay, or its turnover days.";
     var r = await sb.from(table).update({ check_in: selIn, check_out: selOut }).eq("id", id);
-    if (r.error) return r.error.message && r.error.message.indexOf("overlap")>-1 ? "Those dates overlap another stay." : "Didn't save. Try again.";
+    if (r.error) return (r.error.code==="23P01" || (r.error.message||"").indexOf("overlap")>-1) ? "Those dates overlap another stay, or its turnover days." : "Didn't save. Try again.";
     moving = null; selIn = selOut = null; await refresh(); return null;
   }
 
@@ -793,6 +812,10 @@ var NOTIFY_CC = "renee.lemley@mac.com";
       } else {
         var m = mineIds[b.check_in+"|"+b.check_out];
         if (m){ pill += '<span class="pill mine">Yours</span>'; acts = '<button class="btn danger sm" data-act="cancel" data-id="'+esc(m.id)+'">Cancel My Request</button>'; }
+      }
+      if (isHost && bufOf(b)>0){
+        var t1=addDays(b.check_out,1), t2=addDays(b.check_out,bufOf(b));
+        who += (who?"<br>":"")+'<span class="turnnote">Turnover blocked: '+esc(fmtShort(t1))+(t2!==t1?" – "+esc(fmtShort(t2)):"")+' (auto)</span>';
       }
       return '<div class="stay"><div><div class="when">'+when+pill+'</div>'+(who?'<div class="who">'+who+'</div>':'')+'</div><div class="acts">'+acts+'</div></div>';
     }).join("");
@@ -848,7 +871,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
   $("blkBtn").addEventListener("click", async function(){
     if (!selIn || !selOut) return;
     var msg = $("blkMsg");
-    if (clash(selIn, selOut, nightMap())){ msg.textContent = "Those dates overlap a stay already on the calendar."; show("blkMsg", true); return; }
+    if (clashBlock(selIn, selOut, nightMap())){ msg.textContent = "Those dates overlap a stay already on the calendar."; show("blkMsg", true); return; }
     $("blkBtn").disabled = true;
     var r = await sb.from("blocks").insert({ check_in: selIn, check_out: selOut, reason: $("blkReason").value.trim() });
     msg.textContent = r.error ? "Didn't save. Try again." : "Blocked "+fmtShort(selIn)+" to "+fmtShort(selOut)+".";
@@ -861,7 +884,7 @@ var NOTIFY_CC = "renee.lemley@mac.com";
     var msg = $("addMsg"), name = $("addName").value.trim(), em = $("addEmail").value.trim(), party = parseInt($("addParty").value,10)||1;
     if (!selIn || !selOut){ msg.textContent = "Select the dates on the calendar first."; show("addMsg", true); return; }
     if (!name){ msg.textContent = "Add who's staying."; show("addMsg", true); return; }
-    if (clash(selIn, selOut, nightMap())){ msg.textContent = "Those dates overlap another stay or block."; show("addMsg", true); return; }
+    if (clash(selIn, selOut, nightMap())){ msg.textContent = "Those dates overlap another stay, a block, or turnover days."; show("addMsg", true); return; }
     $("addStay").disabled = true;
     var r = await sb.from("bookings").insert({ check_in: selIn, check_out: selOut, name: name, email: em || "hosts@villa-rr.local", party: party, notes: "Added by host", code_label: "host", status: "confirmed" });
     msg.textContent = r.error ? "Didn't save. Try again." : "Added "+name+", "+fmtShort(selIn)+" to "+fmtShort(selOut)+".";

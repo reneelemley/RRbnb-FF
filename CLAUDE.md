@@ -34,6 +34,7 @@ Two audiences, one villa, one shared availability calendar:
   release or **change the dates of** any stay, add a stay directly as Reserved, block and
   move blocked dates, and add or turn off access codes — no code edits needed.
 - **Island events** on `/stay/` (gold dots on calendar days + "On the islands" cards) come from the `EVDEF` / `EVS` lists in `stay/index.html` ("island events" block). Add or update dates there; `exp` = expected (hollow dot), no dates = "dates TBA" card only. Research notes: R&R Guides project `nodes/corridor/events-2027-2029.md`.
+- **Turnover rule (Oct 2026):** a stay holds every day from check-in through the checkout day, then `bookings.buffer_days` turnover days (default 2) are blocked. The database enforces it (`bookings_no_overlap` exclusion on `daterange(check_in, check_out + 1 + buffer_days)`), `calendar()` returns `buffer_days`, and the pages draw turnover days as hatched/blocked (hosts see "Turnover blocked: … (auto)" on each stay). Blocks still end the day before their end date. To allow a tighter handover for one stay, set that booking's `buffer_days` lower in the Supabase table editor.
 - Access today: one shared friends & family code, `FRIENDSOFR&R` (case-insensitive).
 - New requests email `ryan@gusroberts.net` (cc `renee.lemley@mac.com`) through
   FormSubmit (formsubmit.co). The first ever submission sends a one-time activation
